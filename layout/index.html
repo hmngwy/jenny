@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Jenny</title>
+    <link href='https://fonts.googleapis.com/css?family=Share+Tech' rel='stylesheet' type='text/css'>
+    <link href="data:image/x-icon;base64,AAABAAEAEBAQAAEABAAoAQAAFgAAACgAAAAQAAAAIAAAAAEABAAAAAAAgAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAANjY2AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAARERERAAAAAAAAAAAAAAAAEQEBEQAAAAAAAAAAAAAAABEREREAAAAAAAAAAAAAAAARAREBAAAAAAAAAAAAAAAAEREBEQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AADwDwAA//8AAPKPAAD//wAA8A8AAP//AADyLwAA//8AAPCPAAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+    <style>
+      /*html { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }*/
+      body {
+        background-color: #002b36;
+        color: #93a1a1;
+        font-size: 18px;
+        padding: 1em;
+        font-family: 'Share Tech', monospace;
+        line-height: 1.4em;
+      }
+      a { color: inherit; }
+      .posts { list-style: none; padding: 0; margin: 1em 0; line-height: 1.6em; }
+      .post-link { display: table; text-transform: uppercase; margin-bottom: .33em; }
+      .post-link a { text-decoration: none; }
+      .post-link .title:hover {  text-decoration: underline; }
+      .post-link .stamp { color: #586e75; display: table-cell; width: 2.25em; text-align:right; padding-right: 1.5em; }
+      .post-link .title { color: #93a1a1; display: table-cell; vertical-align: top; }
+      nav a { color: #2aa198; text-decoration: none; } nav a:hover { color: #268bd2}
+      nav a+a:before { content: ' • '; }
+    </style>
+  </head>
+  <body>
+    <ul class="posts">
+      __loop__<li class="post-link"><a href="__path__"><span class="stamp">__postdate__</span> <span class="title">__title__</span></a></li>__end loop__
+    </ul>
+    __nav__<nav>__newer__<a href="__newerurl__">← NEWER</a>__end newer__ __older__<a href="__olderurl__">OLDER →</a>__end older__</nav>__end nav__
+  </body>
+</html>
