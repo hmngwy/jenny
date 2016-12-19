@@ -319,3 +319,7 @@ if [ "$1" ] && [ $TARGET_EXISTS == false ]; then
   render
 
 fi
+
+if [ "$(type -t post_hook)" = function ]; then
+  post_hook
+fi
