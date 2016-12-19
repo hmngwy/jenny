@@ -17,17 +17,13 @@ else
 fi
 
 # Set LAYOUT_DIR if empty
-if [ -z "$LAYOUT_DIR" ]; then
-  LAYOUT_DIR=$SCRIPT_DIR/layout
-fi
+[ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/layout
 
 # Set posts_per_page if empty
-if [ -z "$POSTS_PER_PAGE" ]; then
-  POSTS_PER_PAGE=2
-fi
+[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
 
 sed=$(which sed)
-sed=$(which awk)
+awk=$(which awk)
 # Use gsed if present
 if [ "$(which gsed)" ]; then
   sed=$(which gsed)
