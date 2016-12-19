@@ -16,27 +16,41 @@ Link the build script in your `$HOME/bin` folder.
 ln -s ~/jenny/build.sh $HOME/bin/jenny
 ```
 
-Create a directory for your markdown files, create a file, add a date so that Jenny recognizes it as published.
+Prepare the directory for your articles and build folder, create a file with a date so that Jenny recognizes it as a published post.
 
 ```
-mkdir blog && cd blog
-echo "# Hello World" >> 2016-06-06\ first-post.md
+mkdir -p blog/.dist
+echo "# Hello World" >> blog/2016-06-06\ first-post.md
 ```
 
-In the same folder, create a blog config file to tell Jenny where to create the blog. Careful, this file is sourced by Jenny.
+In the same folder, create a .blogconfig file to tell Jenny where the build folder is. Careful, this file is sourced by Jenny.
 
 ```
-echo "DIST=/var/www/html" >> .blogconfig
+echo "DIST=$PWD/.dist" >> blog/.blogconfig
 ```
 
-Finally, run `jenny`
+Finally, run `(cd ~/blog; jenny)`
 
 ### Customization
 
-1. Copy the layout folder, modify, make sure to retain existing template tags, remember linebreaks matter
-2. Add a line to your .blogconfig `LAYOUT_DIR=/home/user/blog/.layout`, change the path
+1. Copy the layout folder and modify the contents to your liking, make sure to retain existing template tags -- remember linebreaks matter
 
-### Some Shortcuts
+   ```
+   cp -R ./layout ~/blog/.layout
+   ```
+   
+2. Let Jenny know where to find your own layout files
+
+   ```
+   echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogconfig
+   ```
+
+### Other Settings
+
+- To modify how many posts per page: `echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogconfig`
+- To run a script after the build process, write a `post_hook` function in .blogconfig
+
+### Handy Shortcuts
 
 Add these to your aliases:
 
@@ -52,5 +66,5 @@ edit () {
 ```
 
 ### Credits
-Layout inspired by n-o-d-e.net 
-Color theme is Solarized by Ethan Schoonover
+- Layout inspired by n-o-d-e.net 
+- Some colors from Solarized by Ethan Schoonover
