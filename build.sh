@@ -3,7 +3,7 @@
 # Load configuration on current dir
 source $PWD/.blogconfig
 
-if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"* ]] && [ -z "$(which gsed)" || -z "$(which gawk)" ]; then
+if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
   echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
   echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogconfig file\n\n  SUPPRESS_UTILS_WARN=1\n"
   echo "Exiting."
