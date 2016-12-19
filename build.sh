@@ -22,15 +22,9 @@ fi
 # Set posts_per_page if empty
 [ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
 
-sed=$(which sed)
-awk=$(which awk)
-# Use gsed if present
-if [ "$(which gsed)" ]; then
-  sed=$(which gsed)
-fi
-if [ "$(which gawk)" ]; then
-  awk=$(which gawk)
-fi
+# Use gnu utils if present
+[ "$(which gsed)" ] && sed=$(which gsed) || sed=$(which sed)
+[ "$(which gawk)" ] && awk=$(which gawk) || awk=$(which awk)
 
 if [ "$1" ]; then
   TARGET_EXISTS=false
@@ -66,7 +60,6 @@ postcount=0
 pagecount=0
 
 indextpl=""
-
 
 parse_details () {
   # Grab file details
@@ -217,7 +210,7 @@ for f in $PWD/*.md; do
     continue
   fi
 
-  if (( $postdateint > $(date +"%Y%m%d") ));then
+  if (( $postdateint > $(date +"%Y%m%d") )); then
     echo "  Scheduled, skipping for now"
     continue
   fi
@@ -276,14 +269,10 @@ if (( $totalpostcount % $POSTS_PER_PAGE == 0 )) && (( $pagecount >= 2 )); then
 fi
 
 # Change 2nd to latest page "newer" link to /
-if [ -f "$DIST/page/$(( $pagecount - 1 )).html" ]; then
-  $sed -i "s/\/page\/${page}.html/\//" "$DIST/page/$(( $pagecount - 1 )).html"
-fi
+[ -f "$DIST/page/$(( $pagecount - 1 )).html" ] && $sed -i "s/\/page\/${page}.html/\//" "$DIST/page/$(( $pagecount - 1 )).html"
 
 # Remove nav if pagecount is 0
-if (( $pagecount == 0)); then
-  $sed -i "s/__nav__.*__end\ nav__//" $DIST/index.html
-fi
+(( $pagecount == 0)) && $sed -i "s/__nav__.*__end\ nav__//" $DIST/index.html
 
 # Remove the insertion marker
 $sed -i "s/__insertloop__//" $DIST/index.html
@@ -316,6 +305,4 @@ if [ "$1" ] && [ $TARGET_EXISTS == false ]; then
 
 fi
 
-if [ "$(type -t post_hook)" = function ]; then
-  post_hook
-fi
+[ "$(type -t post_hook)" = function ] && post_hook
