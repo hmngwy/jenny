@@ -3,7 +3,18 @@
 # Load configuration on current dir
 source $PWD/.blogconfig
 
-SCRIPT_DIR=$(dirname -- "$(readlink -e -- "$BASH_SOURCE")")
+if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"* ]] && [ -z "$(which gsed)" || -z "$(which gawk)" ]; then
+  echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
+  echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogconfig file\n\n  SUPPRESS_UTILS_WARN=1\n"
+  echo "Exiting."
+  exit 0
+fi
+
+if [[ "$(uname -a)" == *"Darwin"* ]]; then
+  SCRIPT_DIR=$(dirname "$(readlink $(which $BASH_SOURCE))")
+else
+  SCRIPT_DIR=$(dirname -- "$(readlink -e -- $BASH_SOURCE)")
+fi
 
 # Set LAYOUT_DIR if empty
 if [ -z "$LAYOUT_DIR" ]; then
@@ -13,6 +24,16 @@ fi
 # Set posts_per_page if empty
 if [ -z "$POSTS_PER_PAGE" ]; then
   POSTS_PER_PAGE=2
+fi
+
+sed=$(which sed)
+sed=$(which awk)
+# Use gsed if present
+if [ "$(which gsed)" ]; then
+  sed=$(which gsed)
+fi
+if [ "$(which gawk)" ]; then
+  awk=$(which gawk)
 fi
 
 if [ "$1" ]; then
@@ -59,9 +80,9 @@ parse_details () {
   slug=$(echo "$filename" | rev | cut -d ' ' -f 1 | rev)
   id=$(echo "$fullfilename" | rev | cut -d ' ' -f 2 | rev)
   timestamp=$(cut -d ' ' -f -1 <<< "$filename")
-  postdate=$(echo $timestamp | sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2\\/\3#')
-  postdatefull=$(echo $timestamp | sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
-  postdateint=$(echo $timestamp | sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
+  postdate=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2\\/\3#')
+  postdatefull=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
+  postdateint=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
 }
 
 find_permalink () {
@@ -78,17 +99,17 @@ find_permalink () {
 
 render () {
   # Run markdown interpreter
-  awk -f $SCRIPT_DIR/lib/md2html.awk "$f" > /tmp/.blogtmp
+  $awk -f $SCRIPT_DIR/lib/md2html.awk "$f" > /tmp/.blogtmp
 
   # Grab the title, and delete the tag
-  title=$(grep -E "<h1.*>(.*?)</h1>" /tmp/.blogtmp | sed 's/<h1.*>\(.*\)<\/h1>.*/\1/')
-  sed -i 's/<h1.*>.*<\/h1>//' /tmp/.blogtmp
+  title=$(grep -E "<h1.*>(.*?)</h1>" /tmp/.blogtmp | $sed 's/<h1.*>\(.*\)<\/h1>.*/\1/')
+  $sed -i 's/<h1.*>.*<\/h1>//' /tmp/.blogtmp
 
   # Embed the processed markup into the post template
-  sed '/__contents__/r /tmp/.blogtmp' $LAYOUT_DIR/post.html | sed '/__contents__/d' > "$dest"
+  $sed '/__contents__/r /tmp/.blogtmp' $LAYOUT_DIR/post.html | $sed '/__contents__/d' > "$dest"
 
   # Embed the title, date, and permalink
-  sed -i -e "s/__title__/$title/" -e "s/__postdate__/$postdate/" -e "s/__path__/\/post\/$slug\.html/" "$dest"
+  $sed -i -e "s/__title__/$title/" -e "s/__postdate__/$postdate/" -e "s/__path__/\/post\/$slug\.html/" "$dest"
 }
 
 create_index () {
@@ -96,23 +117,23 @@ create_index () {
   cp $LAYOUT_DIR/index.html $DIST/index.html
 
   # Copy looped markup, replaced with marker for insertion
-  indextpl=$(awk '/__loop__/,/__end loop__/' $LAYOUT_DIR/index.html | sed 's/__loop__\(.*\)__end\ loop__/\1/')
-  sed -i 's/__loop__\(.*\)__end\ loop__/__insertloop__/' $DIST/index.html
+  indextpl=$($awk '/__loop__/,/__end loop__/' $LAYOUT_DIR/index.html | $sed 's/__loop__\(.*\)__end\ loop__/\1/')
+  $sed -i 's/__loop__\(.*\)__end\ loop__/__insertloop__/' $DIST/index.html
 }
 
 index_insert () {
 
   # Generate the index link
-  echo $indextpl | sed "s/__postdate__/$postdate/" | sed "s/__title__/$title/" | sed "s/__path__/\/post\/$slug\.html/" > /tmp/.blogtmp2
+  echo $indextpl | $sed "s/__postdate__/$postdate/" | $sed "s/__title__/$title/" | $sed "s/__path__/\/post\/$slug\.html/" > /tmp/.blogtmp2
 
   # Insert the index link
-  sed -i "/__insertloop__/r /tmp/.blogtmp2" $DIST/index.html
+  $sed -i "/__insertloop__/r /tmp/.blogtmp2" $DIST/index.html
 
   let postcount++
 
   if (( $postcount == $totalpostcount )); then
-    featured_image=$(awk '/img src="/,/" alt="/' "$DIST/post/$slug.html" | sed 's/\(.*\)img src="\(.*\)" alt="\(.*\)>/\2/')
-    sed -i "s#__featuredimage__#$featured_image#" $DIST/index.html
+    featured_image=$($awk '/img src="/,/" alt="/' "$DIST/post/$slug.html" | $sed 's/\(.*\)img src="\(.*\)" alt="\(.*\)>/\2/')
+    $sed -i "s#__featuredimage__#$featured_image#" $DIST/index.html
   fi
   page=$((($postcount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
   new_page=$(( $postcount % $POSTS_PER_PAGE ))
@@ -121,39 +142,39 @@ index_insert () {
     echo ""
 
     # Remove the insertion marker before we move it
-    sed -i "s/__insertloop__//" $DIST/index.html
+    $sed -i "s/__insertloop__//" $DIST/index.html
 
     # Remove the "older" link on page 1
     if (( $page ==  1 )); then
-      sed -i "s/__older__.*__end\ older__//" $DIST/index.html;
+      $sed -i "s/__older__.*__end\ older__//" $DIST/index.html;
     fi
 
     if (( $page >=  1 )); then
-      sed -i "s/__newer__//" $DIST/index.html;
-      sed -i "s/__end\ newer__//" $DIST/index.html;
-      sed -i "s/__older__//" $DIST/index.html;
-      sed -i "s/__end\ older__//" $DIST/index.html;
+      $sed -i "s/__newer__//" $DIST/index.html;
+      $sed -i "s/__end\ newer__//" $DIST/index.html;
+      $sed -i "s/__older__//" $DIST/index.html;
+      $sed -i "s/__end\ older__//" $DIST/index.html;
     fi
 
-    sed -i "s/__nav__//" $DIST/index.html;
-    sed -i "s/__end\ nav__//" $DIST/index.html;
+    $sed -i "s/__nav__//" $DIST/index.html;
+    $sed -i "s/__end\ nav__//" $DIST/index.html;
 
     # Add the older page nav
-    sed -i "s/__olderurl__/\/page\/$(( page - 1 ))\.html/" $DIST/index.html
+    $sed -i "s/__olderurl__/\/page\/$(( page - 1 ))\.html/" $DIST/index.html
 
     # Add the newer page nav
     if(( $page+1 == $totalpagecount )); then
-      sed -i "s/__newerurl__/\//" $DIST/index.html
+      $sed -i "s/__newerurl__/\//" $DIST/index.html
     else
-      sed -i "s/__newerurl__/\/page\/$(( page + 1 ))\.html/" $DIST/index.html
+      $sed -i "s/__newerurl__/\/page\/$(( page + 1 ))\.html/" $DIST/index.html
     fi
     # Remove the featured image
-    sed -i "s/__fimg__.*__end\ fimg__//" $DIST/index.html
-    sed -i "s/__land__.*__end\ land__//" $DIST/index.html
+    $sed -i "s/__fimg__.*__end\ fimg__//" $DIST/index.html
+    $sed -i "s/__land__.*__end\ land__//" $DIST/index.html
     # Add the page indicator
-    sed -i "s/__pageindicator__//" $DIST/index.html;
-    sed -i "s/__end\ pageindicator__//" $DIST/index.html;
-    sed -i "s/__pagenum__/$(( page ))/" $DIST/index.html;
+    $sed -i "s/__pageindicator__//" $DIST/index.html;
+    $sed -i "s/__end\ pageindicator__//" $DIST/index.html;
+    $sed -i "s/__pagenum__/$(( page ))/" $DIST/index.html;
 
     # Finally move the file
     mv $DIST/index.html "$DIST/page/${page}.html"
@@ -164,20 +185,20 @@ index_insert () {
 
   elif (( $page == $totalpagecount )); then
     #note this scope executed once for every index link on the latest page
-    sed -i "s/__nav__//" $DIST/index.html;
-    sed -i "s/__end\ nav__//" $DIST/index.html;
-    sed -i "s/__older__//" $DIST/index.html;
-    sed -i "s/__olderurl__/\/page\/$(( page - 1))\.html/" $DIST/index.html;
-    sed -i "s/__end\ older__//" $DIST/index.html;
+    $sed -i "s/__nav__//" $DIST/index.html;
+    $sed -i "s/__end\ nav__//" $DIST/index.html;
+    $sed -i "s/__older__//" $DIST/index.html;
+    $sed -i "s/__olderurl__/\/page\/$(( page - 1))\.html/" $DIST/index.html;
+    $sed -i "s/__end\ older__//" $DIST/index.html;
     # Remove the "newer" link on the latest page
-    sed -i "s/__newer__.*__end\ newer__//" $DIST/index.html
-    sed -i "s/__fimg__//" $DIST/index.html
-    sed -i "s/__end\ fimg__//" $DIST/index.html
+    $sed -i "s/__newer__.*__end\ newer__//" $DIST/index.html
+    $sed -i "s/__fimg__//" $DIST/index.html
+    $sed -i "s/__end\ fimg__//" $DIST/index.html
     # leave landing class, remove tpl tags
-    sed -i "s/__land__//" $DIST/index.html
-    sed -i "s/__end\ land__//" $DIST/index.html
+    $sed -i "s/__land__//" $DIST/index.html
+    $sed -i "s/__end\ land__//" $DIST/index.html
     # remove page indicator on latest page
-    sed -i "s/__pageindicator__.*__end\ pageindicator__//" $DIST/index.html
+    $sed -i "s/__pageindicator__.*__end\ pageindicator__//" $DIST/index.html
   fi
 
 }
@@ -246,7 +267,7 @@ for f in $PWD/*.md; do
     render
 
   else
-    title=$(grep -E "^\#\ (.*?)" "$f" | sed 's/^\#\ \(.*\)/\1/')
+    title=$(grep -E "^\#\ (.*?)" "$f" | $sed 's/^\#\ \(.*\)/\1/')
   fi
 
   index_insert
@@ -260,16 +281,16 @@ fi
 
 # Change 2nd to latest page "newer" link to /
 if [ -f "$DIST/page/$(( $pagecount - 1 )).html" ]; then
-  sed -i "s/\/page\/${page}.html/\//" "$DIST/page/$(( $pagecount - 1 )).html"
+  $sed -i "s/\/page\/${page}.html/\//" "$DIST/page/$(( $pagecount - 1 )).html"
 fi
 
 # Remove nav if pagecount is 0
 if (( $pagecount == 0)); then
-  sed -i "s/__nav__.*__end\ nav__//" $DIST/index.html
+  $sed -i "s/__nav__.*__end\ nav__//" $DIST/index.html
 fi
 
 # Remove the insertion marker
-sed -i "s/__insertloop__//" $DIST/index.html
+$sed -i "s/__insertloop__//" $DIST/index.html
 
 # Process single file in argument
 if [ "$1" ] && [ $TARGET_EXISTS == false ]; then
