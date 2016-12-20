@@ -2,7 +2,7 @@ BIN=/usr/local/bin
 SHARE=/usr/local/share
 
 install:
-		install -m 755 ./jenny ./lib/md2html.awk $(BIN)/
+		install -m 755 ./jenny $(BIN)/
 
 		mkdir -p $(SHARE)/jenny
 		cp -R ./share/* $(SHARE)/jenny/
@@ -10,4 +10,4 @@ install:
 		find $(SHARE)/jenny -type d -exec chmod 755 {} \;
 
 uninstall:
-		rm -rf $(BIN)/jenny $(BIN)/md2html.awk $(SHARE)/jenny
+		rm -rf $(BIN)/jenny $(SHARE)/jenny
