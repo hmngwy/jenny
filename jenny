@@ -5,22 +5,35 @@ source $PWD/.blogconfig
 
 if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
   echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
-  echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogconfig file\n\n  SUPPRESS_UTILS_WARN=1\n"
+  echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogconfig file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
   echo "Exiting."
   exit 0
 fi
 
+# Set posts_per_page if empty
+[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
+
+# Check if symlinked for development
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
   SCRIPT_DIR=$(dirname "$(readlink $(which $BASH_SOURCE))")
 else
   SCRIPT_DIR=$(dirname -- "$(readlink -e -- $BASH_SOURCE)")
 fi
 
-# Set LAYOUT_DIR if empty
-[ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/layout
+# If not symlinked, find install path
+if [[ $SCRIPT_DIR = "." ]]; then
+  ABSOLUTE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+fi
 
-# Set posts_per_page if empty
-[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
+if [ -z "$ABSOLUTE_DIR" ]; then
+  # Not installed, use project paths
+  [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/share/layout
+  MARKDOWN=$SCRIPT_DIR/lib/md2html.awk
+else
+  # Installed, use installation paths
+  [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=/usr/local/share/jenny/layout
+  MARKDOWN=$ABSOLUTE_DIR/md2html.awk
+fi
 
 # Use gnu utils if present
 [ "$(which gsed)" ] && sed=$(which gsed) || sed=$(which sed)
@@ -88,7 +101,7 @@ find_permalink () {
 
 render () {
   # Run markdown interpreter
-  $awk -f $SCRIPT_DIR/lib/md2html.awk "$f" > /tmp/.blogtmp
+  $awk -f $MARKDOWN "$f" > /tmp/.blogtmp
 
   # Grab the title, and delete the tag
   title=$(grep -E "<h1.*>(.*?)</h1>" /tmp/.blogtmp | $sed 's/<h1.*>\(.*\)<\/h1>.*/\1/')
