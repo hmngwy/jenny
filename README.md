@@ -69,6 +69,7 @@ edit () {
 ### Credits
 - Layout inspired by n-o-d-e.net 
 - Some colors from Solarized by Ethan Schoonover
+- Makefile inspired by [moebiuseye/skf](https://github.com/moebiuseye/skf)
 
 ### License
 
