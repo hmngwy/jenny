@@ -10,26 +10,26 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 
 ### Usage
 
-Link the build script in your `$HOME/bin` folder.
+Install Jenny to your local bin folder.
 
 ```
-ln -s ~/jenny/build.sh $HOME/bin/jenny
+make install
 ```
 
 Prepare the directory for your articles and build folder, create a file with a date so that Jenny recognizes it as a published post.
 
 ```
 mkdir -p blog/.dist
-echo "# Hello World" >> blog/2016-06-06\ first-post.md
+echo -e "# Hello World\n\nJenny is a static blog generator in bash." >> blog/2016-06-06\ first-post.md
 ```
 
-In the same folder, create a .blogconfig file to tell Jenny where the build folder is. Careful, this file is sourced by Jenny.
+In the same folder, create a .blogrc file to tell Jenny where the build folder is. Careful, this file is sourced by Jenny.
 
 ```
-echo "DIST=$PWD/.dist" >> blog/.blogconfig
+echo "DIST=$CWD/blog/.dist" >> blog/.blogrc
 ```
 
-Finally, run `(cd ~/blog; jenny)`
+Finally, run `(cd blog; jenny)`
 
 ### Customization
 
@@ -38,17 +38,18 @@ Finally, run `(cd ~/blog; jenny)`
    ```
    cp -R ./layout ~/blog/.layout
    ```
-   
+
 2. Let Jenny know where to find your own layout files
 
    ```
-   echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogconfig
+   echo "LAYOUT_DIR=$CWD/blog/.layout" >> ~/blog/.blogrc
    ```
 
 ### Other Settings
 
-- To modify how many posts per page: `echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogconfig`
-- To run a script after the build process, write a `post_hook` function in .blogconfig
+- To configure posts per page: `echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogrc`
+- To run a script after the build process, write a `post_hook` function in .blogrc
+- To uninstall: `make uninstall` in the project folder
 
 ### Handy Shortcuts
 
