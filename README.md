@@ -19,17 +19,17 @@ make install
 Prepare the directory for your articles and build folder, create a file with a date so that Jenny recognizes it as a published post.
 
 ```
-mkdir -p blog/.dist
-echo -e "# Hello World\n\nJenny is a static blog generator in bash." >> blog/2016-06-06\ first-post.md
+mkdir -p ~/blog/.dist
+echo -e "# Hello World\n\nJenny is a static blog generator in bash." >> ~/blog/2016-06-06\ first-post.md
 ```
 
 In the same folder, create a .blogrc file to tell Jenny where the build folder is. Careful, this file is sourced by Jenny.
 
 ```
-echo "DIST=$CWD/blog/.dist" >> blog/.blogrc
+echo "DIST=~/blog/.dist" >> ~/blog/.blogrc
 ```
 
-Finally, run `(cd blog; jenny)`
+Finally, run `(cd ~/blog; jenny)`
 
 ### Customization
 
@@ -42,7 +42,7 @@ Finally, run `(cd blog; jenny)`
 2. Let Jenny know where to find your own layout files
 
    ```
-   echo "LAYOUT_DIR=$CWD/blog/.layout" >> ~/blog/.blogrc
+   echo "LAYOUT_DIR=~/blog/.layout" >> ~/blog/.blogrc
    ```
 
 ### Other Settings
