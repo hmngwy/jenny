@@ -3,7 +3,12 @@
 BLOGRC="$PWD/.blogrc"
 
 # Load configuration on current dir
-[ -f "$BLOGRC" ] && source $BLOGRC || (echo "This is not a blog. Exiting."; exit 1)
+if [ -f "$BLOGRC" ]; then
+  source $BLOGRC
+else
+  echo "This is not a blog. Exiting.";
+  exit 0
+fi
 
 touch $PWD/.lastcompiled
 
