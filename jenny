@@ -237,21 +237,20 @@ for f in $PWD/*.md; do
   #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
   if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
     echo "- Unmodified: $fullfilename";
-    continue
+    RENDER=false
   else
     $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
     echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
+    echo "+ $fullfilename file..";
+    RENDER=true
   fi
-
-  echo "+ $fullfilename file..";
-
 
   if [ "$1" ] && [ "$fullfilename" == "$1" ]; then
     echo "  File exists"
     TARGET_EXISTS=true
     CURRENT_ISNEW=false
     testdest="$DIST/post/$slug.html"
-    if [[ -e $testdest ]] ; then
+    if [[ -e $testdest ]] && [ $RENDER == true ]; then
       collisions=$(find . -regextype posix-extended -regex "^.*$slug\.md" -type f -printf "%f\n")
       collisioncount=$(echo "$collisions" | wc -l)
       i=0
@@ -271,7 +270,7 @@ for f in $PWD/*.md; do
 
   fi
 
-  if [ -z "$1" ] || [ $CURRENT_ISNEW == false ]; then
+  if [ $RENDER == true ] && ( [ -z "$1" ] || [ $CURRENT_ISNEW == false ] ); then
 
     # Find available permalink
     dest="$DIST/post/$slug.html"
