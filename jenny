@@ -3,7 +3,7 @@
 BLOGRC="$PWD/.blogrc"
 
 # Load configuration on current dir
-[ -f "$BLOGRC" ] && source $BLOGRC || echo "This is not a blog. Exiting.";exit 1
+[ -f "$BLOGRC" ] && source $BLOGRC || (echo "This is not a blog. Exiting."; exit 1)
 
 if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
   echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
