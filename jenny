@@ -49,8 +49,8 @@ if [ "$1" ]; then
 else
   echo "Rebuilding all"
   # Clean dist folder if rebuild all
-  rm -rf $DIST/post
   rm -f $DIST/index.html
+  rm -rf $DIST/page/
 fi
 
 # Create directories for pseudo subdirs
