@@ -5,6 +5,8 @@ BLOGRC="$PWD/.blogrc"
 # Load configuration on current dir
 [ -f "$BLOGRC" ] && source $BLOGRC || (echo "This is not a blog. Exiting."; exit 1)
 
+touch $PWD/.lastcompiled
+
 if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
   echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
   echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
@@ -218,17 +220,31 @@ for f in $PWD/*.md; do
   # Grab file details
   parse_details "$f"
 
-  echo "→ $fullfilename file..";
-
   if ! [[ $filename =~ $publish_pattern ]]; then
-    echo "  Draft, skipping"
+    echo "- Draft: $fullfilename file..";
     continue
   fi
 
   if (( $postdateint > $(date +"%Y%m%d") )); then
-    echo "  Scheduled, skipping for now"
+    echo "- Scheduled: $fullfilename file..";
     continue
   fi
+
+  # Check if changed since last compile
+  LAST_MODIFIED_DATE=$(date -r "$f" +%s)
+  COMPILE_RECORD=$(grep "$fullfilename" $PWD/.lastcompiled)
+  COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $sed 's/.*\ //')
+  #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
+  if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
+    echo "- Unmodified: $fullfilename";
+    continue
+  else
+    $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
+    echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
+  fi
+
+  echo "+ $fullfilename file..";
+
 
   if [ "$1" ] && [ "$fullfilename" == "$1" ]; then
     echo "  File exists"
