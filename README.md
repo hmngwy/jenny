@@ -17,14 +17,23 @@ Install Jenny to your local bin folder.
 make install
 ```
 
-Prepare the directory for your articles and build folder, create a file with a date so that Jenny recognizes it as a published post.
+Prepare the directory for your articles and build folder.
 
 ```
 mkdir -p ~/blog/.dist
-echo -e "# Hello World\n\nJenny is a static blog generator in bash." >> ~/blog/2016-06-06\ first-post.md
 ```
 
-In the same folder, create a .blogrc file to tell Jenny where the build folder is. Careful, this file is sourced by Jenny.
+Create a file with a date so that Jenny recognizes it as a published post.
+
+```
+cat <<EOT >> first-post.md
+# Hello World
+
+Jenny is a static blog generator using bash, sed, and awk.
+EOT
+```
+
+Create a .blogrc file to tell Jenny where the build folder is. 
 
 ```
 echo "DIST=~/blog/.dist" >> ~/blog/.blogrc
