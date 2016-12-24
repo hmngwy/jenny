@@ -7,6 +7,7 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - An ugly template syntax
 - Draft/ignore support (by leaving out the date)
 - Forward-posting, i.e. ignores posts with dates in the future
+- Footnotes support
 
 ### Usage
 
