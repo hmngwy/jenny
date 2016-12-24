@@ -446,6 +446,6 @@ END {
 
   # Print footnotes
   print "<ul class=\"fn-list\">"
-  for (i in fnref) print "<li id=\"fn-" i "\" class=\"fn-item\">" inline(i ": " fnref[i]) " <a href=\"#fnref-" i "\" class=\"fn-backref\">↩</a></li>"
+  for (i in fnref) print "<li id=\"fn-" i "\" class=\"fn-item\"><span class=\"fn-handle\">" i ": </span><span class=\"fn-text\">" inline(fnref[i]) " <a href=\"#fnref-" i "\" class=\"fn-backref\">↩</a></span></li>"
   print "</ul>"
 }
