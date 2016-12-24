@@ -27,7 +27,7 @@ function subref(id){
 }
 
 function nextil(t) {
-	if(!match(t, /[`<&\[*_\\-]|(\!\[)/))
+	if(!match(t, /[`<&\[*_\\-]|(\!\[)|(\[\^)/))
 		return t;
 	t1 = substr(t, 1, RSTART - 1);
 	tag = substr(t, RSTART, RLENGTH);
@@ -132,6 +132,12 @@ function nextil(t) {
 			return t1 "<img src=\"" r "\" alt=\"" alt "\" />" nextil(t2);
 		}
 	}
+	# Footnotes
+	if(tag == "[^"){
+		match(t2, /^.*\]/);
+    suptext = substr(t2, RSTART, RLENGTH - 1);
+    return t1 "<sup class=\"fnref\"><a href=\"#fn-" suptext "\" id=\"fnref-" suptext "\">" suptext "</a></sup>";
+	}
 	# Links
 	if(tag == "["){
 		if(!match(t2, /(\[.*\])|(\(.*\))/))
@@ -229,8 +235,8 @@ BEGIN {
 }
 
 # References
-!code && /^ *\[[^\]]*\]:[ 	]+/ {
-	sub(/^ *\[/, "");
+!code && /^ *\[\^![^\]]*\]:[ 	]+/ {
+	sub(/^ *\[\^!/, "");
 	match($0, /\]/);
 	id = substr($0, 1, RSTART - 1);
 	sub(id "\\]:[ 	]+", "");
@@ -240,6 +246,19 @@ BEGIN {
 	sub(/[ 	]+\".*\"$/, "");
 	url = eschtml($0);
 	ref[id] = url title;
+
+	subref(id);
+	next;
+}
+
+!code && /^ *\[\^[^\]]*\]:[ 	]+/ {
+	sub(/^ *\[\^/, "");
+	match($0, /\]/);
+	id = substr($0, 1, RSTART - 1);
+	sub(id "\\]:[ 	]+", "");
+	sub(/[ 	]+\".*\"$/, "");
+	url = eschtml($0);
+	fnref[id] = url;
 
 	subref(id);
 	next;
@@ -424,4 +443,9 @@ END {
 	}
 	gsub(/<<[^\"]*/, "", otext);
 	print(otext);
+
+  # Print footnotes
+  print "<ul class=\"fn-list\">"
+  for (i in fnref) print "<li id=\"fn-" i "\" class=\"fn-item\">" inline(i ": " fnref[i]) " <a href=\"#fnref-" i "\" class=\"fn-backref\">↩</a></li>"
+  print "</ul>"
 }
