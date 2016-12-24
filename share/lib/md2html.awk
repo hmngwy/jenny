@@ -134,9 +134,10 @@ function nextil(t) {
 	}
 	# Footnotes
 	if(tag == "[^"){
-		match(t2, /^.*\]/);
-    suptext = substr(t2, RSTART, RLENGTH - 1);
-    return t1 "<sup class=\"fnref\"><a href=\"#fn-" suptext "\" id=\"fnref-" suptext "\">" suptext "</a></sup>";
+		match(t2, /^[^\]]*(\[[^\]]*\][^\]]*)*/);
+		linktext = substr(t2, 1, RLENGTH);
+		t2 = substr(t2, RLENGTH + 2);
+    return t1 "<sup class=\"fnref\"><a href=\"#fn-" linktext "\" id=\"fnref-" linktext "\">" linktext "</a></sup>" nextil(t2);
 	}
 	# Links
 	if(tag == "["){
