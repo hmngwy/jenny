@@ -237,13 +237,13 @@ for f in $PWD/*.md; do
 
   # If there's no date, then it's a draft
   if ! [[ $filename =~ $publish_pattern ]]; then
-    echo "- Draft: $fullfilename file..";
+    echo "• Draft: $fullfilename file..";
     continue
   fi
 
   # If the date is in the future, then it's scheduled
   if (( $postdateint > $(date +"%Y%m%d") )); then
-    echo "- Scheduled: $fullfilename file..";
+    echo "• Scheduled: $fullfilename file..";
     continue
   fi
 
@@ -253,13 +253,13 @@ for f in $PWD/*.md; do
   COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $sed 's/.*\ //')
   #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
   if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-    echo "- Skipping: $fullfilename";
+    echo "• Skipping: $fullfilename";
     CURRENT_ISNEW=true
     RENDER=false
   else
     $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
     echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
-    echo "+ $fullfilename file..";
+    echo "☶ $fullfilename file..";
     CURRENT_ISNEW=false
     RENDER=true
   fi
@@ -290,7 +290,7 @@ for f in $PWD/*.md; do
     fi
   fi
 
-  echo "  𝍌 post/$slug.html"
+  echo "  - post/$slug.html"
   # If page is for rendering
   if [ $RENDER == true ] && ( [ -z "$1" ] || [ $CURRENT_ISNEW == false ] ); then
 
