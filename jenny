@@ -253,7 +253,7 @@ for f in $PWD/*.md; do
   COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $sed 's/.*\ //')
   #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
   if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-    echo "- Unmodified: $fullfilename";
+    echo "- Skipping: $fullfilename";
     CURRENT_ISNEW=true
     RENDER=false
   else
@@ -290,6 +290,7 @@ for f in $PWD/*.md; do
     fi
   fi
 
+  echo "  𝍌 post/$slug.html"
   # If page is for rendering
   if [ $RENDER == true ] && ( [ -z "$1" ] || [ $CURRENT_ISNEW == false ] ); then
 
@@ -301,8 +302,6 @@ for f in $PWD/*.md; do
     if [ $CURRENT_ISNEW == true ]; then
       find_permalink
     fi
-
-    echo "  𝍌 post/$slug.html"
 
     render
 
