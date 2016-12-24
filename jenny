@@ -242,11 +242,13 @@ for f in $PWD/*.md; do
   #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
   if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
     echo "- Unmodified: $fullfilename";
+    CURRENT_ISNEW=true
     RENDER=false
   else
     $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
     echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
     echo "+ $fullfilename file..";
+    CURRENT_ISNEW=false
     RENDER=true
   fi
 
