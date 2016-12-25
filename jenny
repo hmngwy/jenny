@@ -144,7 +144,9 @@ index_insert () {
   page=$((($postcount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
   new_page=$(( $postcount % $POSTS_PER_PAGE ))
 
-  if (( $new_page == 0 )); then
+  # Create page when we have enough for a page
+  # Or when we don't have any more
+  if (( $new_page == 0 )) || (( $postcount == $totalpostcount )); then
     echo "CREATED PAGE $page"
     echo ""
 
