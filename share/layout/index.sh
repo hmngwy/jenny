@@ -1,3 +1,32 @@
+#!/bin/bash
+
+# Break apart the LIST payload
+IFS='✂︎' read -r -a array <<< "$LIST"
+
+function index_loop {
+	for (( idx=${#array[@]}-1 ; idx>=0 ; idx-- )) ; do
+    [ "${array[idx]}" ] && eval "${array[idx]} list_item"
+  done
+}
+
+function list_item {
+cat << _LOOP_
+  <li class="post-link"><a href="$(echo $POST_URL)"><span class="stamp">$(echo $POST_DATE)</span> <span class="title">$(echo $POST_TITLE)</span></a></li>
+_LOOP_
+}
+
+function nav {
+	if [ "$PAGE_OLD" ] || [ "$PAGE_NEW" ]; then
+cat << _NAV_
+    <nav>
+			$([ "$PAGE_NEW" ] && echo "<a href=\"$PAGE_NEW\">← NEWER</a>")
+			$([ "$PAGE_OLD" ] && echo "<a href=\"$PAGE_OLD\">OLDER →</a>")
+		</nav>
+_NAV_
+	fi
+}
+
+cat << _EOF_
 <!DOCTYPE html>
 <html>
   <head>
@@ -29,8 +58,9 @@
   </head>
   <body>
     <ul class="posts">
-      __loop__<li class="post-link"><a href="__path__"><span class="stamp">__postdate__</span> <span class="title">__title__</span></a></li>__end loop__
+			$(index_loop)
     </ul>
-    __nav__<nav>__newer__<a href="__newerurl__">← NEWER</a>__end newer__ __older__<a href="__olderurl__">OLDER →</a>__end older__</nav>__end nav__
+		$(nav)
   </body>
 </html>
+_EOF_
