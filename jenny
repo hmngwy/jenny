@@ -97,7 +97,7 @@ parse_details () {
   slug=$(echo "$filename" | rev | cut -d ' ' -f 1 | rev)
   id=$(echo "$fullfilename" | rev | cut -d ' ' -f 2 | rev)
   timestamp=$(cut -d ' ' -f -1 <<< "$filename")
-  postdate=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2\\/\3#')
+  postdate=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#')
   postdatefull=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
   postdateint=$(echo $timestamp | $sed -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
 }
@@ -124,11 +124,8 @@ render () {
   title=$(grep -E "<h1.*>(.*?)</h1>" /tmp/.blogtmp | $sed 's/<h1.*>\(.*\)<\/h1>.*/\1/')
   $sed -i 's/<h1.*>.*<\/h1>//' /tmp/.blogtmp
 
-  # Embed the processed markup into the post template
-  $sed '/__contents__/r /tmp/.blogtmp' $LAYOUT_DIR/post.html | $sed '/__contents__/d' > "$dest"
-
-  # Embed the title, date, and permalink
-  $sed -i -e "s/__title__/$title/" -e "s/__postdate__/$postdate/" -e "s/__path__/\/post\/$slug\.html/" "$dest"
+  # Push variables to template file
+  POST_TITLE=$title POST_URL="/post/$slug.html" POST_DATE=$postdate POST_CONTENTS=$(cat /tmp/.blogtmp) $LAYOUT_DIR/post.sh > $dest
 }
 
 # Prepares index and pagination pages
@@ -144,7 +141,7 @@ create_index () {
 # Inserts each article into an index or pagination page
 index_insert () {
   # Generate the index link
-  echo $indextpl | $sed "s/__postdate__/$postdate/" | $sed "s/__title__/$title/" | $sed "s/__path__/\/post\/$slug\.html/" > /tmp/.blogtmp2
+  echo $indextpl | $sed "s/__postdate__/$(echo $postdate | $sed 's#/#\\\/#')/" | $sed "s/__title__/$title/" | $sed "s/__path__/\/post\/$slug\.html/" > /tmp/.blogtmp2
 
   # Insert the index link
   $sed -i "/__insertloop__/r /tmp/.blogtmp2" $DIST/index.html
