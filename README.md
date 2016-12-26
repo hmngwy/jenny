@@ -3,8 +3,8 @@
 _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, but provide some modern conveniences.
 
 - Markdown support, care of [Markdown.awk](https://bitbucket.org/yiyus/md2html.awk)
-- Basic Older and Newer pagination
-- An ugly template syntax
+- Basic pagination with fixed page numbers
+- Heredocs-based template syntax
 - Draft/ignore support (by leaving out the date)
 - Forward-posting, i.e. ignores posts with dates in the future
 - Footnotes support
@@ -33,7 +33,7 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-Create a .blogrc file to tell Jenny where the build folder is. 
+Create a .blogrc file to tell Jenny where the build folder is.
 
 ```
 echo "DIST=~/blog/.dist" >> ~/blog/.blogrc
