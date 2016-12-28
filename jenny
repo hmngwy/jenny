@@ -178,94 +178,106 @@ index_insert () {
 
 }
 
-# Loop through articles in folder
-for f in $PWD/*.md; do
+begin () {
 
-  CURRENT_ISNEW=true
+  # Grabbing the array argument
+  list=("$@")
 
-  # Grab file details
-  parse_details "$f"
+  # Loop through file list in expanded array
+  for f in "${list[@]}"; do
 
-  # If there's no date, then it's a draft
-  if ! [[ $filename =~ $publish_pattern ]]; then
-    echo "• Draft: $fullfilename file..";
-    continue
-  fi
-
-  # If the date is in the future, then it's scheduled
-  if (( $postdateint > $(date +"%Y%m%d") )); then
-    echo "• Scheduled: $fullfilename file..";
-    continue
-  fi
-
-  # Check if changed since last compile
-  LAST_MODIFIED_DATE=$(date -r "$f" +%s)
-  COMPILE_RECORD=$(grep "$fullfilename" $PWD/.lastcompiled)
-  COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $sed 's/.*\ //')
-  #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
-  if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-    echo "• Skipping: $fullfilename";
     CURRENT_ISNEW=true
-    RENDER=false
-  else
-    $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
-    echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
-    echo "☶ $fullfilename file..";
-    CURRENT_ISNEW=false
-    RENDER=true
-  fi
 
-  # This might be a deprecated block
-  # I don't know I wrote this nearly half a year ago :(
-  if [ "$1" ] && [ "$fullfilename" == "$1" ]; then
-    echo "  File exists"
-    TARGET_EXISTS=true
-    CURRENT_ISNEW=false
-    testdest="$DIST/post/$slug.html"
-    if [[ -e $testdest ]] && [ $RENDER == true ]; then
-      collisions=$(find . -regextype posix-extended -regex "^.*$slug\.md" -type f -printf "%f\n")
-      collisioncount=$(echo "$collisions" | wc -l)
-      i=0
-      while read -r line; do
-        if [ "$fullfilename" == "$line" ]; then
-          break
-        else
-          let i++
+    # Grab file details
+    parse_details "$f"
+
+    # If there's no date, then it's a draft
+    if ! [[ $filename =~ $publish_pattern ]]; then
+      echo "• Draft: $fullfilename file..";
+      continue
+    fi
+
+    # If the date is in the future, then it's scheduled
+    if (( $postdateint > $(date +"%Y%m%d") )); then
+      echo "• Scheduled: $fullfilename file..";
+      continue
+    fi
+
+    # Check if changed since last compile
+    LAST_MODIFIED_DATE=$(date -r "$f" +%s)
+    COMPILE_RECORD=$(grep "$fullfilename" $PWD/.lastcompiled)
+    COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $sed 's/.*\ //')
+    #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
+    if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
+      echo "• Skipping: $fullfilename";
+      CURRENT_ISNEW=true
+      RENDER=false
+    else
+      $sed -i "/$(echo $fullfilename | $sed 's/ /\\ /g')/d" $PWD/.lastcompiled
+      echo "$fullfilename $LAST_MODIFIED_DATE" >> $PWD/.lastcompiled
+      echo "☶ $fullfilename file..";
+      CURRENT_ISNEW=false
+      RENDER=true
+    fi
+
+    # This might be a deprecated block
+    # I don't know I wrote this nearly half a year ago :(
+    if [ "$1" ] && [ "$fullfilename" == "$1" ]; then
+      echo "  File exists"
+      TARGET_EXISTS=true
+      CURRENT_ISNEW=false
+      testdest="$DIST/post/$slug.html"
+      if [[ -e $testdest ]] && [ $RENDER == true ]; then
+        collisions=$(find . -regextype posix-extended -regex "^.*$slug\.md" -type f -printf "%f\n")
+        collisioncount=$(echo "$collisions" | wc -l)
+        i=0
+        while read -r line; do
+          if [ "$fullfilename" == "$line" ]; then
+            break
+          else
+            let i++
+          fi
+        done <<< "$collisions"
+        if (( i > 0 )); then
+      echo "  Permalink will collide, setting number increment"
+      let i++
+          slug=$slug-$i
         fi
-      done <<< "$collisions"
-      if (( i > 0 )); then
-    echo "  Permalink will collide, setting number increment"
-    let i++
-        slug=$slug-$i
       fi
     fi
-  fi
 
-  echo "  - post/$slug.html"
-  # If page is for rendering
-  if [ $RENDER == true ] && ( [ -z "$1" ] || [ $CURRENT_ISNEW == false ] ); then
+    echo "  - post/$slug.html"
+    # If page is for rendering
+    if [ $RENDER == true ] && ( [ -z "$1" ] || [ $CURRENT_ISNEW == false ] ); then
 
-    # Find available permalink
-    dest="$DIST/post/$slug.html"
+      # Find available permalink
+      dest="$DIST/post/$slug.html"
 
-    # No need to look if not new ( $CURRENT_ISNEW == false )
-    # $slug will already be set correctly
-    if [ $CURRENT_ISNEW == true ]; then
-      find_permalink
+      # No need to look if not new ( $CURRENT_ISNEW == false )
+      # $slug will already be set correctly
+      if [ $CURRENT_ISNEW == true ]; then
+        find_permalink
+      fi
+
+      render
+
+    else
+      title=$(grep -E "^\#\ (.*?)" "$f" | $sed 's/^\#\ \(.*\)/\1/')
     fi
 
-    render
+    # Finally insert to the current index page
+    index_insert
 
-  else
-    title=$(grep -E "^\#\ (.*?)" "$f" | $sed 's/^\#\ \(.*\)/\1/')
-  fi
+  done
+}
 
-  # Finally insert to the current index page
-  index_insert
+# Get files in current directory
+file_list=($PWD/*.md)
 
-done
+# Start generation
+begin "${file_list[@]}"
 
-# Process single file in argument
+# Deprecated: Process single file in argument
 if [ "$1" ] && [ $TARGET_EXISTS == false ]; then
 
   parse_details "$f"
