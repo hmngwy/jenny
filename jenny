@@ -51,19 +51,14 @@ fi
 [ "$(which gsed)" ] && sed=$(which gsed) || sed=$(which sed)
 [ "$(which gawk)" ] && awk=$(which gawk) || awk=$(which awk)
 
-# Check if trying to rebuild just one page - currently broken
-if [ "$1" ]; then
-  TARGET_EXISTS=false
-  echo "Only building $1"
-else
-  echo "Rebuilding all"
-
-  # Clean dist folder if rebuild all
+clean() {
   rm -f $DIST/index.html
   rm -rf $DIST/page/
   rm -rf $DIST/tag/
 	rm -rf /tmp/jenny*
-fi
+}
+
+clean
 
 # Create directories for pseudo subdirs
 mkdir -p $DIST/post
@@ -217,15 +212,15 @@ begin () {
     # Grab file details
     parse_details "$f"
 
-    # Grabe the tags
-    tagline=`cat "$f" | grep -m 1 "^tags: "`
-    tags=`echo $tagline | $sed -e 's/tags\: \(.*\)/\1/'`
-    for i in $tags; do
-      echo "$f" >> "/tmp/jennytag_$i"
-    done
-
     # Process source files if not working on tag index
     if [ -z "$TAGNAME" ]; then
+
+      # Grab the tags
+      tagline=`cat "$f" | grep -m 1 "^tags: "`
+      tags=`echo $tagline | $sed -e 's/tags\: \(.*\)/\1/'`
+      for i in $tags; do
+        echo "$f" >> "/tmp/jennytag_$i"
+      done
 
       CURRENT_ISNEW=true
 
