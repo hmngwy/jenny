@@ -54,9 +54,12 @@ cat << _EOF_
       .post-link .title { color: #333; display: table-cell; vertical-align: top;font-weight: bold; }
       nav a { color: #555; text-decoration: none; } nav a:hover { color: #268bd2}
       nav a+a:before { content: ' • '; }
+      header { text-transform: uppercase; }
+      header a { text-decoration: none }
     </style>
   </head>
   <body>
+    $(if [ "$TAGNAME" ]; then echo "<header><a href=\"/tag/$TAGNAME\">TAG: $TAGNAME</a></header>"; fi)
     <ul class="posts">
 			$(index_loop)
     </ul>
