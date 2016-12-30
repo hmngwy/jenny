@@ -8,6 +8,7 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - Draft/ignore support (by leaving out the date)
 - Forward-posting, i.e. ignores posts with dates in the future
 - Footnotes support
+- Tags support
 
 ### Usage
 
@@ -60,6 +61,7 @@ Finally, run `(cd ~/blog; jenny)`
 - To configure posts per page: `echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogrc`
 - To run a script after the build process, write a `post_hook` function in .blogrc
 - To uninstall: `make uninstall` in the project folder
+- To use tags add: 'tags: tagname' where tagname is filename friendly
 
 ### Handy Shortcuts
 
