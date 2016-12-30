@@ -124,27 +124,18 @@ render () {
   # Copy source file to a temp file
   cp "$f" /tmp/jennysrc
 
-  tagline=`cat /tmp/jennysrc | grep -m 1 "^tags: "`
-  tags=`echo $tagline | $sed -e 's/tags\: \(.*\)/\1/'`
-  #echo "    tags: $tags"
-
-  for i in $tags; do
-		echo "$f" >> "/tmp/jennytag_$i"
-  done
-
   # Delete the tagline from the temp file
   $sed -i '/^tags\: .*/d' /tmp/jennysrc
 
   # Run markdown interpreter
   $awk -f $MARKDOWN /tmp/jennysrc > /tmp/jennyrender
-  
 
   # Grab the title, and delete the tag
   title=$(grep -E "<h1.*>(.*?)</h1>" /tmp/jennyrender | $sed 's/<h1.*>\(.*\)<\/h1>.*/\1/')
   $sed -i 's/<h1.*>.*<\/h1>//' /tmp/jennyrender
 
   # Push variables to template file
-  POST_TITLE=$title POST_URL="/post/$slug.html" POST_DATE=$postdate POST_CONTENTS=$(cat /tmp/jennyrender) TAGS=$tags $LAYOUT_DIR/post.sh > $dest
+  POST_TITLE=$title POST_URL="/post/$slug.html" POST_DATE=$postdate POST_CONTENTS=$(cat /tmp/jennyrender) TAGS=$TAGS TAGNAME=$TAGNAME $LAYOUT_DIR/post.sh > $dest
 }
 
 
@@ -223,13 +214,20 @@ begin () {
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
 
+    # Grab file details
+    parse_details "$f"
+
+    # Grabe the tags
+    tagline=`cat "$f" | grep -m 1 "^tags: "`
+    tags=`echo $tagline | $sed -e 's/tags\: \(.*\)/\1/'`
+    for i in $tags; do
+      echo "$f" >> "/tmp/jennytag_$i"
+    done
+
     # Process source files if not working on tag index
     if [ -z "$TAGNAME" ]; then
 
       CURRENT_ISNEW=true
-
-      # Grab file details
-      parse_details "$f"
 
       # If there's no date, then it's a draft
       if ! [[ $filename =~ $publish_pattern ]]; then
@@ -273,7 +271,7 @@ begin () {
           find_permalink
         fi
 
-        render
+        TAGNAME=$TAGNAME TAGS=$tags render
 
       else
         title=$(grep -E "^\#\ (.*?)" "$f" | \
@@ -282,15 +280,14 @@ begin () {
       fi
 
     else
-      parse_details "$f"
       title=$(grep -E "^\#\ (.*?)" "$f" | \
         $sed 's/^\#\ \(.*\)/\1/' | \
         $sed -r 's/\\(.)/\1/g' )
-      echo "☶ $fullfilename  file..";
+      echo "+ $fullfilename file..";
     fi # Checks if working on tag index
 
     # Finally insert to the current index page
-    DIST=$DIST TAGNAME=$TAGNAME index_insert
+    DIST=$DIST TAGNAME=$TAGNAME TAGS=$tags index_insert
 
   done
 }
