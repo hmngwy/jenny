@@ -140,14 +140,13 @@ render () {
   $SED -i 's/<h1.*>.*<\/h1>//' $RENDER_TEMP_FILE
 
   # Push variables to template file
-  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$PostDate POST_CONTENTS=$(cat $RENDER_TEMP_FILE) _TAGS=$_TAGS _TAGNAME=$_TAGNAME $LAYOUT_DIR/post.sh > $permalink
+  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$PostDate POST_CONTENTS=$(cat $RENDER_TEMP_FILE) TAGS=$_TAGS TAGNAME=$_TAGNAME $LAYOUT_DIR/post.sh > $permalink
 }
 
 # Inserts each article into an index or pagination page
 index_insert () {
 
-  _DIST=$_DIST
-
+  # If working on a tag index page, adjust pagination links
   if [ $_TAGNAME ]; then
     root="/tag/$_TAGNAME"
   else
@@ -315,7 +314,7 @@ for i in `ls /tmp/jennytag_*`; do
   tagName=`echo $i | $SED "s/\/tmp\/jennytag_//"`
   mkdir -p $DIST/tag/$tagName
   IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
-  _DIST=$DIST/tag/$tagname _TAGNAME=$tagName begin "${fileList[@]}"
+  _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
 done
 IFS="$OIFS"
 
