@@ -13,7 +13,7 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [ ] Next/Previous post navigation
 - [x] Modifiable installation prefix
 - [ ] Define run-time options in command arguments
-- [ ] Optional Perl MultiMarkdown support during install-time
+- [x] Optional Perl MultiMarkdown support during install-time
 
 
 ### Usage

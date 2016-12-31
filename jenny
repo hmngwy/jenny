@@ -72,6 +72,12 @@ else
   [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
   MARKDOWN=$SHARE_DIR/lib/md2html.awk
 fi
+MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
+
+if [ -f $SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl ]; then
+  MARKDOWN=$SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl
+	MARKDOWN_COMMAND="\$MARKDOWN"
+fi
 
 # Use GNU utils if present
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
@@ -127,7 +133,7 @@ render () {
   $SED -i '/^tags\: .*/d' $SOURCE_TEMP_FILE
 
   # Run markdown interpreter
-  $AWK -f $MARKDOWN $SOURCE_TEMP_FILE > $RENDER_TEMP_FILE
+  eval "$MARKDOWN_COMMAND $SOURCE_TEMP_FILE > $RENDER_TEMP_FILE"
 
   # Grab the title, and delete the tag
   title=$(grep -E "<h1.*>(.*?)</h1>" $RENDER_TEMP_FILE | $SED 's/<h1.*>\(.*\)<\/h1>.*/\1/')
