@@ -1,5 +1,6 @@
-BIN=/usr/local/bin
-SHARE=/usr/local/share
+PREFIX?=/usr/local
+BIN=${PREFIX}/bin
+SHARE=${PREFIX}/share
 
 install:
 		@echo "\nInstalling jenny script"
