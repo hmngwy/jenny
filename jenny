@@ -19,6 +19,10 @@ if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(w
   exit 0
 fi
 
+# Set posts_per_page if not set in .blogrc
+[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
+[ -z "$DIST" ] && DIST=$PWD/.dist
+
 # Declare GlobalVariables
 FullFileName=""
 Extension=""
@@ -46,9 +50,6 @@ touch $COMPILE_HISTORY_FILE
 # Create directories for pseudo subdirs
 mkdir -p $DIST/post
 mkdir -p $DIST/page
-
-# Set posts_per_page if not set in .blogrc
-[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
 
 # Use project dir when symlinked
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
