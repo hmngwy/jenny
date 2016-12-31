@@ -33,7 +33,7 @@ mkdir -p ~/blog/.dist
 Create a file with a date so that Jenny recognizes it as a published post.
 
 ```
-cat <<EOT >> "$(date +%Y-%m-%d) first-post.md"
+cat <<EOT >> "~/blog/$(date +%Y-%m-%d) first-post.md"
 # Hello World
 
 Jenny is a static blog generator using bash, sed, and awk.
