@@ -12,7 +12,8 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [ ] RSS/Atom feed
 - [ ] Next/Previous post navigation
 - [ ] Modifiable installation prefix
-- [ ] Define options in command arguments
+- [ ] Define run-time options in command arguments
+- [ ] Optional Perl MultiMarkdown support during install-time
 
 
 ### Usage
