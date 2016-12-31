@@ -67,7 +67,7 @@ Finally, run `(cd ~/blog; jenny)`
 - To install into a custom location do: `make install PREFIX=~/your/path`
 - To uninstall `make uninstall` in the project folder
 - To use MultiMarkdown.pl, run `make mm_install`, and `make mm_uninstall` to remove
-- To configure posts per page: `echo "LAYOUT_DIR=$PWD/.layout" >> ~/blog/.blogrc`
+- To configure posts per page: `echo "POSTS_PER_PAGE=10" >> ~/blog/.blogrc`
 - To run a script after the build process, write a `post_hook` function in .blogrc
 - To use tags add `tags: tagname anothertag` into a post where tagname is filename friendly
 
