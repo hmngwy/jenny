@@ -79,6 +79,19 @@ if [ -f $SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl ]; then
 	MARKDOWN_COMMAND="\$MARKDOWN"
 fi
 
+while getopts ":d:p:l:" opt; do
+  case $opt in
+    d) DIST="$OPTARG"
+    ;;
+    p) POSTS_PER_PAGE="$OPTARG"
+    ;;
+    l) LAYOUT_DIR="$OPTARG"
+    ;;
+    \?) echo "Invalid option -$OPTARG" >&2
+    ;;
+  esac
+done
+
 # Use GNU utils if present
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
 [ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
