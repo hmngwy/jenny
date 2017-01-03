@@ -2,6 +2,7 @@
 
 _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, but provide some modern conveniences.
 
+- [x] Lightweight default theme
 - [x] Markdown with Footnotes support, care of a modified [Markdown.awk](https://bitbucket.org/yiyus/md2html.awk)
 - [x] Optional Perl MultiMarkdown support available during install-time
 - [x] Basic pagination with fixed page numbers
@@ -10,10 +11,10 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [x] Forward-posting, i.e. ignores posts with dates in the future
 - [x] Tags support
 - [x] Modifiable installation prefix
-- [ ] Next/Previous post navigation
+- [ ] Previous post navigation
 - [ ] RSS/Atom feed
 - [x] Define run-time options in command arguments
-- [ ] Unit tests
+- [ ] Tests
 
 
 ### Usage
