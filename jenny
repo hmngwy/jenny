@@ -47,10 +47,6 @@ SHARE_DIR=/usr/local/share/jenny
 # Prepares last modification/compiled database
 touch $COMPILE_HISTORY_FILE
 
-# Create directories for pseudo subdirs
-mkdir -p $DIST/post
-mkdir -p $DIST/page
-
 # Use project dir when symlinked
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
   SCRIPT_DIR=$(dirname "$(readlink $(which $BASH_SOURCE))")
@@ -91,6 +87,10 @@ while getopts ":d:p:l:" opt; do
     ;;
   esac
 done
+
+# Create directories for pseudo subdirs
+mkdir -p $DIST/post
+mkdir -p $DIST/page
 
 # Use GNU utils if present
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
