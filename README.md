@@ -11,9 +11,9 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [x] Forward-posting, i.e. ignores posts with dates in the future
 - [x] Tags support
 - [x] Modifiable installation prefix
+- [x] Define run-time options in command arguments
 - [ ] Previous post navigation
 - [ ] RSS/Atom feed
-- [x] Define run-time options in command arguments
 - [ ] Tests
 
 
@@ -71,7 +71,7 @@ Finally, run `(cd ~/blog; jenny)`
 - To configure posts per page: `echo "POSTS_PER_PAGE=10" >> ~/blog/.blogrc`
 - To run a script after the build process, write a `post_hook` function in .blogrc
 - To use tags add `tags: tagname anothertag` into a post where tagname is filename friendly
-- To use command line arguments: `-d` for dist folder, `-p` for posts per page, `-l` for layout folder
+- To override `.blogrc` settings use command line arguments: `-d` for dist folder, `-p` for posts per page, `-l` for layout folder
 
 ### Handy Shortcuts
 
