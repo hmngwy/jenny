@@ -51,7 +51,7 @@ Finally, run `(cd ~/blog; jenny)`
 
 ### Customization
 
-1. Copy the layout folder and modify the contents to your liking, make sure to retain existing template tags -- remember linebreaks matter
+1. Copy the layout folder and modify the contents to your liking, make sure to retain existing template tags
 
    ```
    cp -R ./layout ~/blog/.layout
