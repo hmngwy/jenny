@@ -45,11 +45,11 @@ cat << _EOF_
         .contents :first-child { margin-top: 0; }
         h1, h2, h3, h4, h5, h6 { font-size: 1em; font-weight: normal; text-transform: uppercase; margin: 2em 0 1em; }
         ol, ul { padding-left: 1em; }
-        ul.fn-list { list-style: none; padding: 2em 0 0; margin-top: 2.5em;border-top: 2px solid #EEE; font-size: .9em;
-        }
+        ul.fn-list { list-style: none; padding: 2em 0 0; margin-top: 2.5em;border-top: 2px solid #EEE; font-size: .9em; }
         .fn-handle, .fn-text { display: table-cell; }
         .fn-handle { padding-right: 1ch; }
         .fnref { line-height: 0 }
+        .tags { lmargin-top: 2.5em; font-size: .9em; }
 
       </style>
     </head>
@@ -58,7 +58,7 @@ cat << _EOF_
       <div class="heading"><a href="$(echo $POST_URL)"><span class="stamp">$(echo $POST_DATE)</span><h1 class="title">$(echo $POST_TITLE)</h1></a></div>
         <a href="/" class="home">←</a><div class="contents">
         $(echo $POST_CONTENTS)
-        $(for i in $TAGS; do echo "<a href=\"/tag/$i\">$i</a>"; done;)
+        <div class="tags">Tagged: $(for i in $TAGS; do echo "<a href=\"/tag/$i\">$i</a>"; done;)</div>
         </div>
       </article>
     </body>
