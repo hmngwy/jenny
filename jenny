@@ -72,7 +72,7 @@ MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
 
 if [ -f $SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl ]; then
   MARKDOWN=$SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl
-	MARKDOWN_COMMAND="\$MARKDOWN"
+  MARKDOWN_COMMAND="\$MARKDOWN"
 fi
 
 while getopts ":d:p:l:" opt; do
@@ -153,7 +153,7 @@ render () {
   $SED -i 's/<h1.*>.*<\/h1>//' $RENDER_TEMP_FILE
 
   # Push variables to template file
-  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$PostDate POST_CONTENTS=$(cat $RENDER_TEMP_FILE) TAGS=$_TAGS TAGNAME=$_TAGNAME $LAYOUT_DIR/post.sh > $permalink
+  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$PostDate POST_CONTENTS=$(cat $RENDER_TEMP_FILE) TAGS=$_TAGS $LAYOUT_DIR/post.sh > $permalink
 }
 
 # Inserts each article into an index or pagination page
@@ -167,7 +167,7 @@ index_insert () {
   fi
 
   # Create the export line for the index.sh template
-  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\"")
+  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" TAGNAME=\"$_TAGNAME\"")
 
   # Count the posts so we can limit them per page
   let PostCount++
@@ -198,6 +198,7 @@ index_insert () {
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
+        TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
     else
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
@@ -205,6 +206,7 @@ index_insert () {
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
         PAGE_NEW=$PAGE_NEW \
+        TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/page/${page}.html"
     fi
 
