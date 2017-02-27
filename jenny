@@ -62,17 +62,18 @@ fi
 if [ -z "$ABSOLUTE_DIR" ]; then
   # Not installed, use project paths
   [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/share/layout
-  MARKDOWN=$SCRIPT_DIR/share/lib/md2html.awk
 else
   # Installed, use installation paths
   [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
-  MARKDOWN=$SHARE_DIR/lib/md2html.awk
 fi
-MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
 
-if [ -f $SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl ]; then
-  MARKDOWN=$SHARE_DIR/lib/MultiMarkdown/bin/MultiMarkdown.pl
-  MARKDOWN_COMMAND="\$MARKDOWN"
+if [ -z "$MARKDOWN_COMMAND" ]; then
+  if [ -z "$ABSOLUTE_DIR" ]; then
+    MARKDOWN=$SCRIPT_DIR/share/lib/md2html.awk
+  else
+    MARKDOWN=$SHARE_DIR/lib/md2html.awk
+  fi
+  MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
 fi
 
 while getopts ":d:p:l:" opt; do
