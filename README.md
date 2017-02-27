@@ -5,6 +5,7 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [x] Lightweight default theme
 - [x] Markdown with Footnotes support, care of a modified [Markdown.awk](https://bitbucket.org/yiyus/md2html.awk)
 - [x] Basic pagination with fixed page numbers
+- [x] Plug your own Markdown parser
 - [x] Heredocs-based template syntax
 - [x] Draft/ignore support (by leaving out the date)
 - [x] Forward-posting, i.e. ignores posts with dates in the future
@@ -67,6 +68,7 @@ Finally, run `(cd ~/blog; jenny)`
 - To install into a custom location do: `make install PREFIX=~/your/path`
 - To uninstall `make uninstall` in the project folder
 - To configure posts per page: `echo "POSTS_PER_PAGE=10" >> ~/blog/.blogrc`
+- To use your own markdown parser: `echo "MARKDOWN_COMMAND=multimarkdown" >> ~/blog/.blogrc`
 - To run a script after the build process, write a `post_hook` function in .blogrc
 - To use tags add `tags: tagname anothertag` into a post where tagname is filename friendly
 - To override `.blogrc` settings use command line arguments: `-d` for dist folder, `-p` for posts per page, `-l` for layout folder
