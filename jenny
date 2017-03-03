@@ -196,13 +196,25 @@ index_insert () {
 
     # This is where we should generate the heredocs template for index
     if (( $page == $TotalPageCount )); then
+      # This is the generation for the main index, i.e. /
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
+      if (( ${#IndexList[@]} < $POSTS_PER_PAGE )) && (( $TotalPageCount > 1 )); then
+        # If main index page is not full, fill from next page
+        IFS='✂︎' read -r -a append <<< "$LastList"
+        IndexList="BREAK=$(($TotalPageCount - 1))✂︎$IndexList"
+        for (( idx=0 ; idx<(POSTS_PER_PAGE-${#IndexList[@]}) ; idx++ )) ; do
+          IndexList="${append[idx]}✂︎$IndexList"
+        done
+        echo $IndexList
+      fi
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
     else
+      # This is the generation for paged indexes, i.e. page/*
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
+      LastList=$IndexList
       mkdir -p $_DIST/page
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
