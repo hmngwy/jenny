@@ -202,10 +202,9 @@ index_insert () {
         # If main index page is not full, fill from next page
         IFS='✂︎' read -r -a append <<< "$LastList"
         IndexList="BREAK=$(($TotalPageCount - 1))✂︎$IndexList"
-        for (( idx=0 ; idx<(POSTS_PER_PAGE-${#IndexList[@]}) ; idx++ )) ; do
+        for (( idx=$POSTS_PER_PAGE ; idx>${#IndexList[@]} ; idx-- )) ; do
           IndexList="${append[idx]}✂︎$IndexList"
         done
-        echo $IndexList
       fi
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
