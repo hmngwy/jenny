@@ -15,11 +15,12 @@ cat << _EOF_
         body {
           background-color: white;
           color: #444;
-          font-size: 16px;
+          font-size: 14px;
           padding: 1em;
           font-family: 'Roboto', sans-serif;
           line-height: 1.5em;
         }
+        @media (min-width: 736px) { body { font-size: 16px } }
         article { padding: 0; margin: 1em 0; max-width: 70ch; }
         article a { color: #b58900; }
         article img { max-width: 100% }
