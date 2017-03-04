@@ -216,6 +216,7 @@ index_insert () {
       LastList=$IndexList
       mkdir -p $_DIST/page
       LIST="$IndexList" \
+        PAGE_NUM=$page \
         PAGE_OLD=$PAGE_OLD \
         PAGE_NEW=$PAGE_NEW \
         TAGNAME=$_TAGNAME \
