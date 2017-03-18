@@ -13,6 +13,7 @@ install:
 		find $(SHARE)/jenny -type f -exec chmod 644 {} \;
 		find $(SHARE)/jenny -type d -exec chmod 755 {} \;
 		chmod +x $(SHARE)/jenny/lib/md2html.awk
+		chmod +x $(SHARE)/jenny/layout/*.sh
 
 uninstall:
 		@echo "Removing script and assets"
