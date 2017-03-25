@@ -76,6 +76,10 @@ if [ -z "$MARKDOWN_COMMAND" ]; then
   MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
 fi
 
+if [ "$STATIC_DIRS" ]; then
+  eval "cp -R $STATIC_DIRS $DIST"
+fi
+
 while getopts ":d:p:l:" opt; do
   case $opt in
     d) DIST="$OPTARG"
