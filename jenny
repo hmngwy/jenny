@@ -13,7 +13,7 @@ fi
 # Checks if user is on macOS and checks for dependencies
 # Also handles suppresion of this very message
 if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
-  echo -e "macOS users need 'gsed' and 'gawk', install them via: brew install gawk gnu-sed\n"
+  echo -e "macOS users need 'gsed', 'gawk', and  'gdate', install them via: brew install gawk gnu-sed coreutils\n"
   echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
   echo "Exiting."
   exit 0
@@ -100,6 +100,7 @@ mkdir -p $DIST/page
 # Use GNU utils if present
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
 [ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
+[ "$(which gdate)" ] && DATE=$(which gdate) || AWK=$(which date)
 
 # Fn Helpers
 ceiling_divide() {
@@ -127,6 +128,7 @@ parse_details () {
   PostDate=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#')
   PostDateFull=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
   PostDateInt=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
+  PostDateRFC822=`$DATE --rfc-822 --date="$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1/\2/\3#')"`
 }
 
 # Used to find available permalink if Slug not unique
@@ -172,7 +174,7 @@ index_insert () {
   fi
 
   # Create the export line for the index.sh template
-  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" TAGNAME=\"$_TAGNAME\"")
+  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" POST_DATE_RFC822=\"$PostDateRFC822\" TAGNAME=\"$_TAGNAME\"")
 
   # Count the posts so we can limit them per page
   let PostCount++
@@ -214,6 +216,14 @@ index_insert () {
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
+
+      echo "Generating feed.xml"
+      echo ""
+
+      LIST="$IndexList" \
+        PAGE_OLD=$PAGE_OLD \
+        TAGNAME=$_TAGNAME \
+        $LAYOUT_DIR/rss2.sh > "$_DIST/feed.xml"
     else
       # This is the generation for paged indexes, i.e. page/*
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
