@@ -100,7 +100,7 @@ mkdir -p $DIST/page
 # Use GNU utils if present
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
 [ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
-[ "$(which gdate)" ] && DATE=$(which gdate) || AWK=$(which date)
+[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
 
 # Fn Helpers
 ceiling_divide() {
