@@ -362,3 +362,5 @@ IFS="$OIFS"
 
 # Run the user defined hook
 [ "$(type -t post_hook)" = function ] && post_hook
+
+exit 0
