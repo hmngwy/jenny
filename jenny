@@ -270,8 +270,8 @@ begin () {
     if [ -z "$_TAGNAME" ]; then
 
       # Grab the tags
-      tagLine=`cat "$f" | grep -m 1 "^tags: "`
-      tags=`echo $tagLine | $SED -e 's/tags\: \(.*\)/\1/'`
+      tagLine=`cat "$f" | grep -m 1 "^[Tt]ags: "`
+      tags=`echo $tagLine | $SED -e 's/[Tt]ags\: \(.*\)/\1/'`
       for i in $tags; do
         echo "$f" >> "/tmp/jennytag_$i"
       done
