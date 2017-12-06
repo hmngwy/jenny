@@ -46,6 +46,13 @@ Create a .blogrc file to tell Jenny where the build folder is.
 echo "DIST=~/blog/.dist" >> ~/blog/.blogrc
 ```
 
+Also, let it know the host name and title of your site.
+
+```
+echo "BLOG_HOST=\"example.com\"" >> ~/blog/.blogrc
+echo "BLOG_TITLE=\"Example Title\"" >> ~/blog/.blogrc
+```
+
 Finally, run `(cd ~/blog; jenny)`
 
 ### Customization
@@ -88,7 +95,7 @@ edit () {
 ```
 
 ### Credits
-- Layout inspired by n-o-d-e.net 
+- Layout inspired by n-o-d-e.net
 - Some colors from Solarized by Ethan Schoonover
 - Makefile inspired by [moebiuseye/skf](https://github.com/moebiuseye/skf)
 
