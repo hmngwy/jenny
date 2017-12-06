@@ -223,6 +223,8 @@ index_insert () {
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
+        BLOG_HOST=$BLOG_HOST \
+        BLOG_TITLE=$BLOG_TITLE \
         $LAYOUT_DIR/rss2.sh > "$_DIST/feed.xml"
     else
       # This is the generation for paged indexes, i.e. page/*
