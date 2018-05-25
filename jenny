@@ -354,12 +354,14 @@ _DIST=$DIST begin "${fileList[@]}"
 
 # Now generate indexes for tags
 OIFS="$IFS"
-for i in `ls /tmp/jennytag_*`; do
-  tagName=`echo $i | $SED "s/\/tmp\/jennytag_//"`
-  mkdir -p $DIST/tag/$tagName
-  IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
-  _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
-done
+if compgen -G "/tmp/jennytag_*"; then
+  for i in `ls /tmp/jennytag_*`; do
+    tagName=`echo $i | $SED "s/\/tmp\/jennytag_//"`
+    mkdir -p $DIST/tag/$tagName
+    IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
+    _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
+  done
+fi
 IFS="$OIFS"
 
 # Run the user defined hook
