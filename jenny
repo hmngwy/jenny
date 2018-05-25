@@ -54,10 +54,15 @@ else
   SCRIPT_DIR=$(dirname -- "$(readlink -e -- $BASH_SOURCE)")
 fi
 
+# h/t https://gist.github.com/TheMengzor/968e5ea87e99d9c41782
 # Populate flag to check if installed
-if [[ $SCRIPT_DIR = "." ]]; then
-  ABSOLUTE_DIR="$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
-fi
+SOURCE="${BASH_SOURCE[0]}"
+while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
+  ABSOLUTE_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+  SOURCE="$(readlink "$SOURCE")"
+  [[ $SOURCE != /* ]] && SOURCE="$ABSOLUTE_DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
+done
+ABSOLUTE_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 if [ -z "$ABSOLUTE_DIR" ]; then
   # Not installed, use project paths
