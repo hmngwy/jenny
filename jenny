@@ -56,7 +56,7 @@ fi
 
 # Populate flag to check if installed
 if [[ $SCRIPT_DIR = "." ]]; then
-  ABSOLUTE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+  ABSOLUTE_DIR="$(cd "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
 fi
 
 if [ -z "$ABSOLUTE_DIR" ]; then
