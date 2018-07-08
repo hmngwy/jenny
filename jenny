@@ -2,7 +2,7 @@
 
 # Declare CONSTANTS
 PUBLISH_PATTERN="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
-COMPILE_HISTORY_FILE=$(pwd)/.compile_history
+BLOG_LOCK=$(pwd)/.bloglock
 SOURCE_TEMP_FILE=$(mktemp)
 RENDER_TEMP_FILE=$(mktemp)
 TAGS_TEMP_DIR=$(mktemp -d)
@@ -38,7 +38,7 @@ if source_blogrc; then
   fi
 
   # Sets up directory
-  touch $COMPILE_HISTORY_FILE
+  touch $BLOG_LOCK
   mkdir -p $DIST/post
   mkdir -p $DIST/page
 
@@ -177,7 +177,6 @@ index_insert () {
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
 
       echo "$T Generating feed.xml"
-      echo ""
 
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
@@ -225,12 +224,6 @@ begin () {
     # Process source files if not working on tag index
     if [ -z "$_TAGNAME" ]; then
 
-      # Grab the tags
-      tags=$(get_tags "$f")
-      for i in $tags; do
-        echo "$f" >> "$TAGS_TEMP_DIR/$i"
-      done
-
       if is_draft "$f"; then
         echo "$T • Draft: $(get_full_filename "$f") file..";
         continue
@@ -241,6 +234,12 @@ begin () {
         continue
       fi
 
+      # Grab the tags
+      tags=$(get_tags "$f")
+      for i in $tags; do
+        echo "$f" >> "$TAGS_TEMP_DIR/$i"
+      done
+
       # Grab file details
       FullFileName=$(get_full_filename "$f")
       Extension=$(get_extension "$f")
@@ -250,26 +249,10 @@ begin () {
       PostDate=$(get_post_date "$f")
       PostDateRFC822=$(get_post_date_rfc822 "$f")
 
-      # Check if changed since last compile
-      LAST_MODIFIED_DATE=$(get_last_modified_timestamp "$f")
-      COMPILE_RECORD=$(grep "$FullFileName" $COMPILE_HISTORY_FILE)
-      COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $SED 's/.*\ //')
-      #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-      #  echo "$T • Skipping: $FullFileName";
-      #  isCurrentNew=true
-      #  forRendering=false
-      #else
-      #  $SED -i "/$(echo $FullFileName | $SED 's/ /\\ /g')/d" $COMPILE_HISTORY_FILE
-      #  echo "$FullFileName $LAST_MODIFIED_DATE" >> $COMPILE_HISTORY_FILE
-      #  echo "$T ☶ $FullFileName file..";
-      #  isCurrentNew=false
-      #  forRendering=true
-      #fi
-
       forRendering=false
       isCurrentNew=false
       if is_new "$f"; then
-        echo "$T ☶ $f"
+        echo "$T ☶ $FullFileName"
         isCurrentNew=true
         forRendering=true
       else
@@ -278,14 +261,13 @@ begin () {
           echo "$T ↑ $f"
           forRendering=true
         else
-          echo "$T - $f"
-
+          echo "$T - $FullFileName"
         fi
       fi
 
       local content_sum=$(cat "$f" | md5)
       local filename_sum=$(echo "$f" | md5)
-      echo "$filename_sum $content_sum" >> $COMPILE_HISTORY_FILE
+      echo "$filename_sum $content_sum" >> $BLOG_LOCK
 
       # If page is for rendering
       if [ $forRendering == true ] && ( [ -z "$1" ] || [ $isCurrentNew == false ] ); then
@@ -312,13 +294,15 @@ begin () {
       title=$(grep -E "^\#\ (.*?)" "$f" | \
         $SED 's/^\#\ \(.*\)/\1/' | \
         $SED -r 's/\\(.)/\1/g' )
-      echo "$T + $FullFileName file..";
+      echo "$T ☶ " $(get_full_filename "$f")
     fi # Checks if working on tag index
 
     # Finally insert to the current index page
     _DIST=$_DIST _TAGNAME=$_TAGNAME _TAGS=$tags index_insert
 
   done
+
+  echo
 }
 
 # Clean DIST folder first

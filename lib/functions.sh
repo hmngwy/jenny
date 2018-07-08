@@ -55,8 +55,8 @@ function get_total_post_count() {
   local list=("$@")
 	local non_draft=($(printf "%s\n" "${list[@]}" | grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)'))
 	local count=0
-  for f in "${non_draft[@]}"; do
-		if ! is_scheduled "$f"; then
+  for f1 in "${non_draft[@]}"; do
+		if ! is_scheduled "$f1"; then
 			let count++
 		fi
 	done
@@ -138,7 +138,7 @@ function get_last_modified_timestamp() {
 
 function is_new() {
 	local filename_sum=$(echo "$1" | md5)
-	grep $filename_sum $COMPILE_HISTORY_FILE > /dev/null
+	grep $filename_sum $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0 # is new
 	else
@@ -149,7 +149,7 @@ function is_new() {
 function is_changed() {
 	local filename_sum=$(echo "$1" | md5)
 	local content_sum=$(cat "$1" | md5)
-	grep "$filename_sum $content_sum" $COMPILE_HISTORY_FILE > /dev/null
+	grep "$filename_sum $content_sum" $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0 # is changed
 	else
