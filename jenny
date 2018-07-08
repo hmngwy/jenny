@@ -1,5 +1,8 @@
 #!/usr/bin/env bash
 
+# Clean DIST folder first
+_DIST=$DIST clean
+
 # Declare CONSTANTS
 PUBLISH_PATTERN="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
 BLOG_LOCK=$(pwd)/.bloglock
@@ -89,8 +92,12 @@ done
 
 # Creates individual post pages
 render () {
+  local file=$1
+  local destination=$2
+  local title=$3
+  local tags=$4
   # Copy source file to a temp file
-  cp "$1" $SOURCE_TEMP_FILE
+  cp "$file" $SOURCE_TEMP_FILE
 
   # Delete the tagline from the temp file
   $SED -i '/^tags\: .*/d' $SOURCE_TEMP_FILE
@@ -98,12 +105,16 @@ render () {
   # Run markdown interpreter
   eval "$MARKDOWN_COMMAND $SOURCE_TEMP_FILE > $RENDER_TEMP_FILE"
 
-  # Grab the title, and delete the tag
-  title=$(grep -E "<h1.*>(.*?)</h1>" $RENDER_TEMP_FILE | $SED 's/<h1.*>\(.*\)<\/h1>.*/\1/')
+  # Delete the tag
   $SED -i 's/<h1.*>.*<\/h1>//' $RENDER_TEMP_FILE
 
   # Push variables to template file
-  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$(get_post_date "$1") POST_CONTENTS=$(cat $RENDER_TEMP_FILE) TAGS=$_TAGS $LAYOUT_DIR/post.sh > $permalink
+  POST_TITLE=$title \
+    POST_URL="/post/$(get_slug "$file").html" \
+    POST_DATE=$(get_post_date "$file") \
+    POST_CONTENTS=$(cat $RENDER_TEMP_FILE) \
+    TAGS=$tags \
+    $LAYOUT_DIR/post.sh > $destination
 }
 
 # Inserts each article into an index or pagination page
@@ -117,7 +128,7 @@ index_insert () {
   fi
 
   # Create the export line for the index.sh template
-  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" POST_DATE_RFC822=\"$PostDateRFC822\" TAGNAME=\"$_TAGNAME\"")
+  IndexList+=("POST_URL=\"/post/$slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" POST_DATE_RFC822=\"$PostDateRFC822\" TAGNAME=\"$_TAGNAME\"")
 
   # Count the posts so we can limit them per page
   let PostCount++
@@ -205,6 +216,10 @@ begin () {
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
 
+    title=$(get_title "$f")
+    slug=$(get_slug "$f")
+    local destination="$_DIST/post/$slug.html"
+
     # Process source files if not working on tag index
     if [ -z "$_TAGNAME" ]; then
 
@@ -226,7 +241,6 @@ begin () {
 
       # Grab file details
       FullFileName=$(get_full_filename "$f")
-      Slug=$(get_slug "$f")
       PostDate=$(get_post_date "$f")
       PostDateRFC822=$(get_post_date_rfc822 "$f")
 
@@ -251,28 +265,12 @@ begin () {
       # If page is for rendering
       if [ $forRendering=true ]; then
 
-        # Find available permalink
-        permalink="$_DIST/post/$Slug.html"
-        if [ -f $permalink ]; then
-          Slug=$(find_slug $Slug)
-          permalink="$_DIST/post/$Slug.html"
-        fi
+        echo "$T   /post/$slug.html"
+        render "$f" "$destination" "$title" "$tags"
 
-        echo "$T   /post/$Slug.html"
-
-        _TAGNAME=$_TAGNAME _TAGS=$tags render "$f"
-
-      else
-        # not for rendering but generate title for index_insert
-        title=$(grep -E "^\#\ (.*?)" "$f" | \
-          $SED 's/^\#\ \(.*\)/\1/' | \
-          $SED -r 's/\\(.)/\1/g' )
       fi
 
     else
-      title=$(grep -E "^\#\ (.*?)" "$f" | \
-        $SED 's/^\#\ \(.*\)/\1/' | \
-        $SED -r 's/\\(.)/\1/g' )
       echo "$T ☶ " $(get_full_filename "$f")
     fi # Checks if working on tag index
 
@@ -284,8 +282,6 @@ begin () {
   echo
 }
 
-# Clean DIST folder first
-_DIST=$DIST clean
 
 # Get files in current directory
 fileList=(*.md)
@@ -295,7 +291,7 @@ _DIST=$DIST begin "${fileList[@]}"
 
 # Now generate indexes for tags
 OIFS="$IFS"
-if compgen -G "$TAGS_TEMP_DIR/*"; then
+if compgen -G "$TAGS_TEMP_DIR/*" > /dev/null; then
   for i in `ls $TAGS_TEMP_DIR/*`; do
     tagName=$(basename $i)
     mkdir -p $DIST/tag/$tagName

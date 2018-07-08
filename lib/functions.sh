@@ -81,7 +81,16 @@ function get_filename() {
 }
 
 function get_slug() {
-  echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev
+  local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
+  if [ -f $_DIST/post/$slug.html ]; then
+    local i=2
+    while [[ -e $_DIST/post/$slug-$i.html ]] ; do
+      let i++
+    done
+    echo "$slug-$i"
+  else
+    echo $slug
+  fi
 }
 
 function get_id() {
@@ -157,10 +166,8 @@ function is_changed() {
 	fi
 }
 
-function find_slug() {
-	local i=2
-	while [[ -e $DIST/post/$1-$i.html ]] ; do
-		let i++
-	done
-	echo "$1-$i"
+function get_title() {
+  echo $(grep -E "^\#\ (.*?)" "$1" | \
+    $SED 's/^\#\ \(.*\)/\1/' | \
+    $SED -r 's/\\(.)/\1/g' )
 }
