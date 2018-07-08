@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 # Load configuration on current dir
 function source_blogrc() {
   BLOGRC="$(pwd)/.blogrc"
@@ -34,9 +36,9 @@ function join_by { local IFS="$1"; shift; echo "$*"; }
 
 function script_dir() {
   if [[ "$(uname -a)" == *"Darwin"* ]]; then
-    print $(dirname "$(readlink $(which $BASH_SOURCE))")
+    echo $(dirname "$(readlink $(which $BASH_SOURCE))")
   else
-    print $(dirname -- "$(readlink -e -- $BASH_SOURCE)")
+    echo $(dirname -- "$(readlink -e -- $BASH_SOURCE)")
   fi
 }
 
@@ -47,4 +49,36 @@ function is_installed() {
   else
     return 1 # Not installed
   fi
+}
+
+function get_total_post_count() {
+  list=("$@")
+  echo $(printf "%s\n"  "${list[@]}" | \
+    grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)' | \
+    wc -l)
+}
+
+function get_total_page_count() {
+  # usage fn(total post count, posts per page)
+  echo $((($1+$2-1)/$2))
+}
+
+function get_full_filename() {
+  echo $(basename "$1")
+}
+
+function get_extension() {
+  echo $(get_full_filename "$1") | rev | cut -d. -f1 | rev
+}
+
+function get_filename() {
+  echo $(get_full_filename "$1") | cut -d. -f1
+}
+
+function get_slug() {
+  echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev
+}
+
+function get_id() {
+  echo $(get_full_filename "$1") | rev | cut -d ' ' -f 2 | rev
 }

@@ -92,11 +92,11 @@ done
 # Used to generate info from filename
 parse_details () {
   # Grab file details
-  FullFileName=$(basename "$1")
-  Extension="${FullFileName##*.}"
-  Filename="${FullFileName%.*}"
-  Slug=$(echo "$Filename" | rev | cut -d ' ' -f 1 | rev)
-  Id=$(echo "$FullFileName" | rev | cut -d ' ' -f 2 | rev)
+  FullFileName=$(get_full_filename "$1")
+  Extension=$(get_extension "$1")
+  Filename=$(get_filename "$1")
+  Slug=$(get_slug "$1")
+  Id=$(get_id "$1")
   Timestamp=$(cut -d ' ' -f -1 <<< "$Filename")
   PostDate=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#')
   PostDateFull=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
@@ -226,10 +226,8 @@ begin () {
   # Grabbing the array argument
   list=("$@")
 
-  TotalPostCount=$(printf "%s\n"  "${list[@]}" | \
-    grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)' | \
-    wc -l)
-  TotalPageCount=$((($TotalPostCount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
+  TotalPostCount=$(get_total_post_count $@)
+  TotalPageCount=$(get_total_page_count $TotalPostCount $POSTS_PER_PAGE)
 
   # Reset variables
   PostCount=0
@@ -269,7 +267,6 @@ begin () {
       LAST_MODIFIED_DATE=$(date -r "$f" +%s)
       COMPILE_RECORD=$(grep "$FullFileName" $COMPILE_HISTORY_FILE)
       COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $SED 's/.*\ //')
-      #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
       if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
         echo "$T • Skipping: $FullFileName";
         isCurrentNew=true
