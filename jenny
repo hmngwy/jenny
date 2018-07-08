@@ -65,10 +65,7 @@ fi
 
 # Declare GlobalVariables
 FullFileName=""
-Extension=""
-Filename=""
 Slug=""
-Timestamp=""
 PostDate=""
 PostDateInt=""
 TotalPostCount=0
@@ -89,19 +86,6 @@ while getopts ":d:p:l:" opt; do
     ;;
   esac
 done
-
-# Used to find available permalink if Slug not unique
-find_permalink () {
-  if [[ -e $permalink ]] ; then
-    echo "$T  Permalink taken, finding unique increment number"
-    i=2
-    while [[ -e $DIST/post/$Slug-$i.html ]] ; do
-      let i++
-    done
-    Slug=$Slug-$i
-  fi
-  permalink="$DIST/post/$Slug.html"
-}
 
 # Creates individual post pages
 render () {
@@ -242,23 +226,18 @@ begin () {
 
       # Grab file details
       FullFileName=$(get_full_filename "$f")
-      Extension=$(get_extension "$f")
-      Filename=$(get_filename "$f")
       Slug=$(get_slug "$f")
-      Timestamp=$(get_timestamp "$f")
       PostDate=$(get_post_date "$f")
       PostDateRFC822=$(get_post_date_rfc822 "$f")
 
       forRendering=false
-      isCurrentNew=false
       if is_new "$f"; then
         echo "$T ☶ $FullFileName"
-        isCurrentNew=true
         forRendering=true
       else
         # not new
         if is_changed "$f"; then
-          echo "$T ↑ $f"
+          echo "$T ↑ $FullFileName"
           forRendering=true
         else
           echo "$T - $FullFileName"
@@ -270,21 +249,21 @@ begin () {
       echo "$filename_sum $content_sum" >> $BLOG_LOCK
 
       # If page is for rendering
-      if [ $forRendering == true ] && ( [ -z "$1" ] || [ $isCurrentNew == false ] ); then
-        echo "$T Rendering post/$Slug.html"
+      if [ $forRendering=true ]; then
 
         # Find available permalink
         permalink="$_DIST/post/$Slug.html"
-
-        # No need to look if not new ( $isCurrentNew == false )
-        # $Slug will already be set correctly
-        if [ $isCurrentNew == true ]; then
-          find_permalink
+        if [ -f $permalink ]; then
+          Slug=$(find_slug $Slug)
+          permalink="$_DIST/post/$Slug.html"
         fi
+
+        echo "$T   /post/$Slug.html"
 
         _TAGNAME=$_TAGNAME _TAGS=$tags render "$f"
 
       else
+        # not for rendering but generate title for index_insert
         title=$(grep -E "^\#\ (.*?)" "$f" | \
           $SED 's/^\#\ \(.*\)/\1/' | \
           $SED -r 's/\\(.)/\1/g' )

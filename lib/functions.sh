@@ -156,3 +156,11 @@ function is_changed() {
 		return 1
 	fi
 }
+
+function find_slug() {
+	local i=2
+	while [[ -e $DIST/post/$1-$i.html ]] ; do
+		let i++
+	done
+	echo "$1-$i"
+}
