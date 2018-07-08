@@ -53,9 +53,14 @@ function is_installed() {
 
 function get_total_post_count() {
   local list=("$@")
-  echo $(printf "%s\n"  "${list[@]}" | \
-    grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)' | \
-    wc -l)
+	local non_draft=($(printf "%s\n" "${list[@]}" | grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)'))
+	local count=0
+  for f in "${non_draft[@]}"; do
+		if ! is_scheduled "$f"; then
+			let count++
+		fi
+	done
+	echo $count
 }
 
 function get_total_page_count() {
