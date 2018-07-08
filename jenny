@@ -53,7 +53,7 @@ fi
 # Also handles suppresion of this very message
 if is_utils_installed; then
   echo -e "$T macOS users need gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed coreutils\n"
-  echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
+  echo -e "$T If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
   exit 0
 fi
 
@@ -107,7 +107,7 @@ parse_details () {
 # Used to find available permalink if Slug not unique
 find_permalink () {
   if [[ -e $permalink ]] ; then
-    echo "  Permalink taken, finding unique increment number"
+    echo "$T  Permalink taken, finding unique increment number"
     i=2
     while [[ -e $DIST/post/$Slug-$i.html ]] ; do
       let i++
@@ -158,7 +158,7 @@ index_insert () {
   # Create page when we have enough for a page
   # Or when we don't have any more
   if (( $isNewPage == 0 )) || (( $PostCount == $TotalPostCount )); then
-    echo "CREATED PAGE $page"
+    echo "$T CREATED PAGE $page"
     echo ""
 
     # Add the older page nav
@@ -190,7 +190,7 @@ index_insert () {
         TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
 
-      echo "Generating feed.xml"
+      echo "$T Generating feed.xml"
       echo ""
 
       LIST="$IndexList" \
@@ -221,7 +221,7 @@ index_insert () {
 
 begin () {
 
-  echo "Working in $_DIST"
+  echo "$T Working in $_DIST"
 
   # Grabbing the array argument
   list=("$@")
@@ -255,13 +255,13 @@ begin () {
 
       # If there's no date, then it's a draft
       if ! [[ $Filename =~ $PUBLISH_PATTERN ]]; then
-        echo "• Draft: $FullFileName file..";
+        echo "$T • Draft: $FullFileName file..";
         continue
       fi
 
       # If the date is in the future, then it's scheduled
       if (( $PostDateInt > $(date +"%Y%m%d") )); then
-        echo "• Scheduled: $FullFileName file..";
+        echo "$T • Scheduled: $FullFileName file..";
         continue
       fi
 
@@ -271,18 +271,18 @@ begin () {
       COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $SED 's/.*\ //')
       #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
       if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-        echo "• Skipping: $FullFileName";
+        echo "$T • Skipping: $FullFileName";
         isCurrentNew=true
         forRendering=false
       else
         $SED -i "/$(echo $FullFileName | $SED 's/ /\\ /g')/d" $COMPILE_HISTORY_FILE
-        echo "$FullFileName $LAST_MODIFIED_DATE" >> $COMPILE_HISTORY_FILE
-        echo "☶ $FullFileName file..";
+        echo "$T $FullFileName $LAST_MODIFIED_DATE" >> $COMPILE_HISTORY_FILE
+        echo "$T ☶ $FullFileName file..";
         isCurrentNew=false
         forRendering=true
       fi
 
-      echo "  - post/$Slug.html"
+      echo "$T  - post/$Slug.html"
       # If page is for rendering
       if [ $forRendering == true ] && ( [ -z "$1" ] || [ $isCurrentNew == false ] ); then
 
@@ -307,7 +307,7 @@ begin () {
       title=$(grep -E "^\#\ (.*?)" "$f" | \
         $SED 's/^\#\ \(.*\)/\1/' | \
         $SED -r 's/\\(.)/\1/g' )
-      echo "+ $FullFileName file..";
+      echo "$T + $FullFileName file..";
     fi # Checks if working on tag index
 
     # Finally insert to the current index page
