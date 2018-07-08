@@ -89,21 +89,6 @@ while getopts ":d:p:l:" opt; do
   esac
 done
 
-# Used to generate info from filename
-parse_details () {
-  # Grab file details
-  FullFileName=$(get_full_filename "$1")
-  Extension=$(get_extension "$1")
-  Filename=$(get_filename "$1")
-  Slug=$(get_slug "$1")
-  Id=$(get_id "$1")
-  Timestamp=$(cut -d ' ' -f -1 <<< "$Filename")
-  PostDate=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#')
-  PostDateFull=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
-  PostDateInt=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
-  PostDateRFC822=`$DATE --rfc-822 --date="$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1/\2/\3#')"`
-}
-
 # Used to find available permalink if Slug not unique
 find_permalink () {
   if [[ -e $permalink ]] ; then
@@ -237,14 +222,21 @@ begin () {
   for f in "${list[@]}"; do
 
     # Grab file details
-    parse_details "$f"
+    FullFileName=$(get_full_filename "$f")
+    Extension=$(get_extension "$f")
+    Filename=$(get_filename "$f")
+    Slug=$(get_slug "$f")
+    Timestamp=$(get_timestamp "$f")
+    PostDate=$(get_post_date "$f")
+    PostDateFull=$(get_post_date_full "$f")
+    PostDateInt=$(get_post_date_int "$f")
+    PostDateRFC822=$(get_post_date_rfc822 "$f")
 
     # Process source files if not working on tag index
     if [ -z "$_TAGNAME" ]; then
 
       # Grab the tags
-      tagLine=`cat "$f" | grep -m 1 "^[Tt]ags: "`
-      tags=`echo $tagLine | $SED -e 's/[Tt]ags\: \(.*\)/\1/'`
+      tags=$(get_tags "$f")
       for i in $tags; do
         echo "$f" >> "/tmp/jennytag_$i"
       done

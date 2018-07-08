@@ -82,3 +82,28 @@ function get_slug() {
 function get_id() {
   echo $(get_full_filename "$1") | rev | cut -d ' ' -f 2 | rev
 }
+
+function get_timestamp() {
+  echo $(get_filename "$1") | cut -d ' ' -f -1
+}
+
+function get_post_date() {
+  echo $(get_timestamp "$1") | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#'
+}
+
+function get_post_date_full() {
+  echo $(get_timestamp "$1") | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#'
+}
+
+function get_post_date_int() {
+  echo $(get_timestamp "$1") | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#'
+}
+
+function get_post_date_rfc822() {
+  $DATE --rfc-822 --date="$(echo $(get_timestamp "$1") | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1/\2/\3#')"
+}
+
+function get_tags() {
+  tag_line=$(cat "$1" | grep -m 1 "^[Tt]ags: ")
+  echo $tag_line | $SED -e 's/[Tt]ags\: \(.*\)/\1/'
+}
