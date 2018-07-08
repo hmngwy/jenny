@@ -52,7 +52,7 @@ function is_installed() {
 }
 
 function get_total_post_count() {
-  list=("$@")
+  local list=("$@")
   echo $(printf "%s\n"  "${list[@]}" | \
     grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)' | \
     wc -l)
@@ -104,6 +104,50 @@ function get_post_date_rfc822() {
 }
 
 function get_tags() {
-  tag_line=$(cat "$1" | grep -m 1 "^[Tt]ags: ")
+  local tag_line=$(cat "$1" | grep -m 1 "^[Tt]ags: ")
   echo $tag_line | $SED -e 's/[Tt]ags\: \(.*\)/\1/'
+}
+
+function is_draft() {
+	# if filename doesn't match publish pattern
+	local publish_pattern="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
+	if ! [[ $(get_filename "$1") =~ $PUBLISH_PATTERN ]]; then
+		return 0 # is draft
+	else
+		return 1
+	fi
+}
+
+function is_scheduled() {
+	# if the date is in the future, then it's scheduled
+	if (( $(get_post_date_int "$1") > $(date +"%Y%m%d") )); then
+		return 0 # is scheduled
+	else
+		return 1
+	fi
+}
+
+function get_last_modified_timestamp() {
+	date -r "$1" +%s
+}
+
+function is_new() {
+	local filename_sum=$(echo "$1" | md5)
+	grep $filename_sum $COMPILE_HISTORY_FILE > /dev/null
+	if [ ! $? -eq 0 ]; then
+		return 0 # is new
+	else
+		return 1
+	fi
+}
+
+function is_changed() {
+	local filename_sum=$(echo "$1" | md5)
+	local content_sum=$(cat "$1" | md5)
+	grep "$filename_sum $content_sum" $COMPILE_HISTORY_FILE > /dev/null
+	if [ ! $? -eq 0 ]; then
+		return 0 # is changed
+	else
+		return 1
+	fi
 }
