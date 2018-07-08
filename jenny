@@ -3,8 +3,9 @@
 # Declare CONSTANTS
 PUBLISH_PATTERN="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
 COMPILE_HISTORY_FILE=$(pwd)/.compile_history
-SOURCE_TEMP_FILE=/tmp/jennysource
-RENDER_TEMP_FILE=/tmp/jennyrender
+SOURCE_TEMP_FILE=$(mktemp)
+RENDER_TEMP_FILE=$(mktemp)
+TAGS_TEMP_DIR=$(mktemp -d)
 SHARE_DIR=/usr/local/share/jenny
 T="[jenny]"
 
@@ -238,7 +239,7 @@ begin () {
       # Grab the tags
       tags=$(get_tags "$f")
       for i in $tags; do
-        echo "$f" >> "/tmp/jennytag_$i"
+        echo "$f" >> "$TAGS_TEMP_DIR/$i"
       done
 
       isCurrentNew=true
@@ -316,14 +317,12 @@ _DIST=$DIST begin "${fileList[@]}"
 
 # Now generate indexes for tags
 OIFS="$IFS"
-if compgen -G "/tmp/jennytag_*"; then
-  for i in `ls /tmp/jennytag_*`; do
-    tagName=`echo $i | $SED "s/\/tmp\/jennytag_//"`
-    mkdir -p $DIST/tag/$tagName
-    IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
-    _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
-  done
-fi
+for i in `ls $TAGS_TEMP_DIR/*`; do
+  tagName=$(basename $i)
+  mkdir -p $DIST/tag/$tagName
+  IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
+  _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
+done
 IFS="$OIFS"
 
 # Run the user defined hook
