@@ -53,7 +53,7 @@ function is_installed() {
 
 function get_total_post_count() {
   local list=("$@")
-	local non_draft=($(printf "%s\n" "${list[@]}" | grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)'))
+	local non_draft=($(printf "%s\n" "${list[@]}" | $GREP -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)'))
 	local count=0
   for f1 in "${non_draft[@]}"; do
 		if ! is_scheduled "$f1"; then
@@ -82,11 +82,11 @@ function get_filename() {
 
 function get_slug() {
   local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
-	grep "$slug" $BLOG_LOCK > /dev/null
+	$GREP "$slug" $BLOG_LOCK > /dev/null
 	if [ $? -eq 0 ]; then
     # slug exists
     local i=2
-    while grep "$slug-$1" $BLOG_LOCK > /dev/null; do
+    while $GREP "$slug-$1" $BLOG_LOCK > /dev/null; do
       let i++
     done
     echo "$slug-$i"
@@ -120,7 +120,7 @@ function get_post_date_rfc822() {
 }
 
 function get_tags() {
-  local tag_line=$(cat "$1" | grep -m 1 "^[Tt]ags: ")
+  local tag_line=$(cat "$1" | $GREP -m 1 "^[Tt]ags: ")
   echo $tag_line | $SED -e 's/[Tt]ags\: \(.*\)/\1/'
 }
 
@@ -148,7 +148,7 @@ function get_last_modified_timestamp() {
 }
 
 function is_new() {
-	grep $1 $BLOG_LOCK > /dev/null
+	$GREP $1 $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0 # is new
 	else
@@ -157,7 +157,7 @@ function is_new() {
 }
 
 function is_changed() {
-	grep "$1" $BLOG_LOCK > /dev/null
+	$GREP "$1" $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0
 	else
@@ -166,7 +166,7 @@ function is_changed() {
 }
 
 function get_title() {
-  echo $(grep -E "^\#\ (.*?)" "$1" | \
+  echo $($GREP -E "^\#\ (.*?)" "$1" | \
     $SED 's/^\#\ \(.*\)/\1/' | \
     $SED -r 's/\\(.)/\1/g' )
 }
