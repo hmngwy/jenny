@@ -82,15 +82,17 @@ function get_filename() {
 
 function get_slug() {
   local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
-  if [ -f $_DIST/post/$slug.html ]; then
+	grep "$slug" $BLOG_LOCK > /dev/null
+	if [ $? -eq 0 ]; then
+    # slug exists
     local i=2
-    while [[ -e $_DIST/post/$slug-$i.html ]] ; do
+    while grep "$slug-$1" $BLOG_LOCK > /dev/null; do
       let i++
     done
     echo "$slug-$i"
-  else
+	else
     echo $slug
-  fi
+	fi
 }
 
 function get_id() {
@@ -156,10 +158,10 @@ function is_new() {
 
 function is_changed() {
 	grep "$1" $BLOG_LOCK > /dev/null
-	if [ $? -eq 0 ]; then
-		return 1
-	else
+	if [ ! $? -eq 0 ]; then
 		return 0
+	else
+		return 1
 	fi
 }
 

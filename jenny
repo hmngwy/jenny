@@ -126,13 +126,13 @@ begin () {
       if is_new "$filename_sum"; then
         forRendering=true
         echo "$T + /post/$slug.html"
-        echo "$filename_sum $content_sum" >> $BLOG_LOCK
+        echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
       else
         # not new
         if is_changed "$filename_sum $content_sum"; then
-          echo "$T ↑ $full_file_name"
+          echo "$T ↑ /post/$slug.html"
           $SED -i "/$filename_sum/d" $BLOG_LOCK
-          echo "$filename_sum $content_sum" >> $BLOG_LOCK
+          echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
           forRendering=true
         fi
       fi
