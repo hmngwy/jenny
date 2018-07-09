@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
 
-# Clean DIST folder first
-_DIST=$DIST clean
-
 # Declare CONSTANTS
 PUBLISH_PATTERN="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
 BLOG_LOCK=$(pwd)/.bloglock
@@ -68,9 +65,6 @@ fi
 [ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
 
 # Declare GlobalVariables
-full_file_name=""
-Slug=""
-page_index=0
 declare -a IndexList
 
 while getopts ":d:p:l:" opt; do
@@ -166,9 +160,11 @@ begin () {
   echo
 }
 
+# Clean DIST folder first
+_DIST=$DIST clean
 
 # Get files in current directory
-fileList=(*.md)
+local fileList=(*.md)
 
 # Start generation
 _DIST=$DIST begin "${fileList[@]}"

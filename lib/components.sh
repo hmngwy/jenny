@@ -36,6 +36,7 @@ index_insert () {
   local total_post_count=$4
   local total_page_count=$5
   local post_index=$6
+
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
   local page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
