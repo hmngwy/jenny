@@ -16,7 +16,7 @@ cat << _LOOP_
 _LOOP_
   else
 cat << _LOOP_
-  <li class="post-link"><a href="/page/$(echo $BREAK)">Under page $(echo $BREAK)</a></li>
+  <li class="post-link"><a href="/page/$(echo $BREAK).html">In page $(echo $BREAK)</a></li>
 _LOOP_
   fi
 }

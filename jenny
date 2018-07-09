@@ -1,51 +1,13 @@
 #!/usr/bin/env bash
 
-BLOGRC="$PWD/.blogrc"
-
-# Load configuration on current dir
-if [ -f "$BLOGRC" ]; then
-  source $BLOGRC
-else
-  echo "This is not a blog. Exiting.";
-  exit 0
-fi
-
-# Checks if user is on macOS and checks for dependencies
-# Also handles suppresion of this very message
-if [ -z "$SUPPRESS_UTILS_WARN" ] && [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
-  echo -e "macOS users need 'gsed', 'gawk', and  'gdate', install them via: brew install gawk gnu-sed coreutils\n"
-  echo -e "If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
-  echo "Exiting."
-  exit 0
-fi
-
-# Set posts_per_page if not set in .blogrc
-[ -z "$POSTS_PER_PAGE" ] && POSTS_PER_PAGE=5
-[ -z "$DIST" ] && DIST=$PWD/.dist
-
-# Declare GlobalVariables
-FullFileName=""
-Extension=""
-Filename=""
-Slug=""
-Timestamp=""
-PostDate=""
-PostDateInt=""
-TotalPostCount=0
-TotalPageCount=0
-PostCount=0
-PageCount=0
-declare -a IndexList
-
 # Declare CONSTANTS
 PUBLISH_PATTERN="^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)"
-COMPILE_HISTORY_FILE=$PWD/.compile_history
-SOURCE_TEMP_FILE=/tmp/jennysource
-RENDER_TEMP_FILE=/tmp/jennyrender
+BLOG_LOCK=$(pwd)/.bloglock
+SOURCE_TEMP_FILE=$(mktemp)
+RENDER_TEMP_FILE=$(mktemp)
+TAGS_TEMP_DIR=$(mktemp -d)
 SHARE_DIR=/usr/local/share/jenny
-
-# Prepares last modification/compiled database
-touch $COMPILE_HISTORY_FILE
+T="[jenny]"
 
 # Use project dir when symlinked
 if [[ "$(uname -a)" == *"Darwin"* ]]; then
@@ -54,36 +16,56 @@ else
   SCRIPT_DIR=$(dirname -- "$(readlink -e -- $BASH_SOURCE)")
 fi
 
-# h/t https://gist.github.com/TheMengzor/968e5ea87e99d9c41782
-# Populate flag to check if installed
-SOURCE="${BASH_SOURCE[0]}"
-while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symlink
-  ABSOLUTE_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
-  SOURCE="$(readlink "$SOURCE")"
-  [[ $SOURCE != /* ]] && SOURCE="$ABSOLUTE_DIR/$SOURCE" # if $SOURCE was a relative symlink, we need to resolve it relative to the path where the symlink file was located
-done
-ABSOLUTE_DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
+# Load library
+source $SCRIPT_DIR/lib/helpers.sh
+source $SCRIPT_DIR/lib/components.sh
 
-if [ -z "$ABSOLUTE_DIR" ]; then
-  # Not installed, use project paths
-  [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/share/layout
-else
-  # Installed, use installation paths
-  [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
-fi
+# Load configuration on current dir
+if source_blogrc; then
+  echo "$T Sourced .blogrc"
 
-if [ -z "$MARKDOWN_COMMAND" ]; then
-  if [ -z "$ABSOLUTE_DIR" ]; then
-    MARKDOWN=$SCRIPT_DIR/share/lib/md2html.awk
+  # Set defaults if not set in .blogrc
+  [ -z $POSTS_PER_PAGE ] && POSTS_PER_PAGE=5
+  [ -z $DIST ] && DIST=$PWD/.dist
+
+  if is_installed; then
+    # Installed, use installation path
+    [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
+    [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SHARE_DIR/lib/md2html.awk"
   else
-    MARKDOWN=$SHARE_DIR/lib/md2html.awk
+    # Not installed, use project path
+    [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/share/layout
+    [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SCRIPT_DIR/share/lib/md2html.awk"
   fi
-  MARKDOWN_COMMAND="\$AWK -f \$MARKDOWN"
+
+  # Sets up directory
+  touch $BLOG_LOCK
+  mkdir -p $DIST/post
+  mkdir -p $DIST/page
+
+  if [ "$STATIC_DIRS" ]; then
+    eval "cp -R $STATIC_DIRS $DIST"
+  fi
+else
+  echo "$T Could not find .blogrc in this directory, exiting."
+  exit 1
 fi
 
-if [ "$STATIC_DIRS" ]; then
-  eval "cp -R $STATIC_DIRS $DIST"
+# Checks if user is on macOS and checks for dependencies
+# Also handles suppresion of this very message
+if is_utils_installed; then
+  echo -e "$T macOS users need gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed coreutils\n"
+  echo -e "$T If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
+  exit 0
 fi
+
+# Use GNU utils if present
+[ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
+[ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
+[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
+
+# Declare GlobalVariables
+declare -a IndexList
 
 while getopts ":d:p:l:" opt; do
   case $opt in
@@ -98,254 +80,88 @@ while getopts ":d:p:l:" opt; do
   esac
 done
 
-# Create directories for pseudo subdirs
-mkdir -p $DIST/post
-mkdir -p $DIST/page
-
-# Use GNU utils if present
-[ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
-[ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
-[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
-
-# Fn Helpers
-ceiling_divide() {
-  ceiling_result=$((($1+$2-1)/$2))
-}
-
-clean() {
-  rm -f $_DIST/index.html
-  rm -rf $_DIST/page/
-  rm -rf $_DIST/tag/
-  rm -rf /tmp/jenny*
-}
-
-function join_by { local IFS="$1"; shift; echo "$*"; }
-
-# Used to generate info from filename
-parse_details () {
-  # Grab file details
-  FullFileName=$(basename "$1")
-  Extension="${FullFileName##*.}"
-  Filename="${FullFileName%.*}"
-  Slug=$(echo "$Filename" | rev | cut -d ' ' -f 1 | rev)
-  Id=$(echo "$FullFileName" | rev | cut -d ' ' -f 2 | rev)
-  Timestamp=$(cut -d ' ' -f -1 <<< "$Filename")
-  PostDate=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\2/\3#')
-  PostDateFull=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\ \2\-\3#')
-  PostDateInt=$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1\2\3#')
-  PostDateRFC822=`$DATE --rfc-822 --date="$(echo $Timestamp | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1/\2/\3#')"`
-}
-
-# Used to find available permalink if Slug not unique
-find_permalink () {
-  if [[ -e $permalink ]] ; then
-    echo "  Permalink taken, finding unique increment number"
-    i=2
-    while [[ -e $DIST/post/$Slug-$i.html ]] ; do
-      let i++
-    done
-    Slug=$Slug-$i
-  fi
-  permalink="$DIST/post/$Slug.html"
-}
-
-# Creates individual post pages
-render () {
-  # Copy source file to a temp file
-  cp "$f" $SOURCE_TEMP_FILE
-
-  # Delete the tagline from the temp file
-  $SED -i '/^tags\: .*/d' $SOURCE_TEMP_FILE
-
-  # Run markdown interpreter
-  eval "$MARKDOWN_COMMAND $SOURCE_TEMP_FILE > $RENDER_TEMP_FILE"
-
-  # Grab the title, and delete the tag
-  title=$(grep -E "<h1.*>(.*?)</h1>" $RENDER_TEMP_FILE | $SED 's/<h1.*>\(.*\)<\/h1>.*/\1/')
-  $SED -i 's/<h1.*>.*<\/h1>//' $RENDER_TEMP_FILE
-
-  # Push variables to template file
-  POST_TITLE=$title POST_URL="/post/$Slug.html" POST_DATE=$PostDate POST_CONTENTS=$(cat $RENDER_TEMP_FILE) TAGS=$_TAGS $LAYOUT_DIR/post.sh > $permalink
-}
-
-# Inserts each article into an index or pagination page
-index_insert () {
-
-  # If working on a tag index page, adjust pagination links
-  if [ $_TAGNAME ]; then
-    root="/tag/$_TAGNAME"
-  else
-    root=""
-  fi
-
-  # Create the export line for the index.sh template
-  IndexList+=("POST_URL=\"/post/$Slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$PostDate\" POST_DATE_RFC822=\"$PostDateRFC822\" TAGNAME=\"$_TAGNAME\"")
-
-  # Count the posts so we can limit them per page
-  let PostCount++
-
-  page=$((($PostCount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
-  isNewPage=$(( $PostCount % $POSTS_PER_PAGE ))
-
-  # Create page when we have enough for a page
-  # Or when we don't have any more
-  if (( $isNewPage == 0 )) || (( $PostCount == $TotalPostCount )); then
-    echo "CREATED PAGE $page"
-    echo ""
-
-    # Add the older page nav
-    [[ $(( page - 1 )) > 0 ]] && PAGE_OLD="$root/page/$(( page - 1 )).html" || PAGE_OLD=""
-
-    # Add the newer page nav
-    if (( $page+1 == $TotalPageCount )); then
-      PAGE_NEW="$root/"
-    else
-      PAGE_NEW="$root/page/$(( page + 1 )).html"
-    fi
-
-    let PageCount++
-
-    # This is where we should generate the heredocs template for index
-    if (( $page == $TotalPageCount )); then
-      # This is the generation for the main index, i.e. /
-      IndexList=$(join_by '✂︎' "${IndexList[@]}")
-      if (( ${#IndexList[@]} < $POSTS_PER_PAGE )) && (( $TotalPageCount > 1 )); then
-        # If main index page is not full, fill from next page
-        IFS='✂︎' read -r -a append <<< "$LastList"
-        IndexList="BREAK=$(($TotalPageCount - 1))✂︎$IndexList"
-        for (( idx=$POSTS_PER_PAGE ; idx>${#IndexList[@]} ; idx-- )) ; do
-          IndexList="${append[idx]}✂︎$IndexList"
-        done
-      fi
-      LIST="$IndexList" \
-        PAGE_OLD=$PAGE_OLD \
-        TAGNAME=$_TAGNAME \
-        $LAYOUT_DIR/index.sh > "$_DIST/index.html"
-
-      echo "Generating feed.xml"
-      echo ""
-
-      LIST="$IndexList" \
-        PAGE_OLD=$PAGE_OLD \
-        TAGNAME=$_TAGNAME \
-        BLOG_HOST=$BLOG_HOST \
-        BLOG_TITLE=$BLOG_TITLE \
-        $LAYOUT_DIR/rss2.sh > "$_DIST/feed.xml"
-    else
-      # This is the generation for paged indexes, i.e. page/*
-      IndexList=$(join_by '✂︎' "${IndexList[@]}")
-      LastList=$IndexList
-      mkdir -p $_DIST/page
-      LIST="$IndexList" \
-        PAGE_NUM=$page \
-        PAGE_OLD=$PAGE_OLD \
-        PAGE_NEW=$PAGE_NEW \
-        TAGNAME=$_TAGNAME \
-        $LAYOUT_DIR/index.sh > "$_DIST/page/${page}.html"
-    fi
-
-    # Reset array for a new page
-    unset IndexList
-
-  fi
-
-}
-
 begin () {
 
-  echo "Working in $_DIST"
+  if [ -z "$_TAGNAME" ]; then
+    echo "$T Generating main index"
+  else
+    echo "$T Generating $_TAGNAME tag index"
+  fi
 
   # Grabbing the array argument
-  list=("$@")
+  local list=("$@")
 
-  TotalPostCount=$(printf "%s\n"  "${list[@]}" | \
-    grep -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)' | \
-    wc -l)
-  TotalPageCount=$((($TotalPostCount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
+  local total_post_count=$(get_total_post_count $@)
+  local total_page_count=$(get_total_page_count $total_post_count $POSTS_PER_PAGE)
 
   # Reset variables
-  PostCount=0
-  PageCount=0
+  local post_index=0
 
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
 
-    # Grab file details
-    parse_details "$f"
+    local full_file_name=$(get_full_filename "$f")
+    local title=$(get_title "$f")
+    local slug=$(get_slug "$f")
+    local destination="$_DIST/post/$slug.html"
 
     # Process source files if not working on tag index
     if [ -z "$_TAGNAME" ]; then
 
+      if is_draft "$f"; then
+        echo "$T • Draft: $full_file_name file..";
+        continue
+      fi
+
+      if is_scheduled "$f"; then
+        echo "$T • Scheduled: $full_file_name file..";
+        continue
+      fi
+
+      local content_sum=$(cat "$f" | md5)
+      local filename_sum=$(echo "$f" | md5)
+
+      echo "$T ☶ $full_file_name"
+      forRendering=false
+      if is_new "$filename_sum"; then
+        forRendering=true
+        echo "$T + /post/$slug.html"
+        echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
+      else
+        # not new
+        if is_changed "$filename_sum $content_sum"; then
+          echo "$T ↑ /post/$slug.html"
+          $SED -i "/$filename_sum/d" $BLOG_LOCK
+          echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
+          forRendering=true
+        fi
+      fi
+
       # Grab the tags
-      tagLine=`cat "$f" | grep -m 1 "^[Tt]ags: "`
-      tags=`echo $tagLine | $SED -e 's/[Tt]ags\: \(.*\)/\1/'`
+      tags=$(get_tags "$f")
       for i in $tags; do
-        echo "$f" >> "/tmp/jennytag_$i"
+        echo "$f" >> "$TAGS_TEMP_DIR/$i"
       done
 
-      isCurrentNew=true
-
-      # If there's no date, then it's a draft
-      if ! [[ $Filename =~ $PUBLISH_PATTERN ]]; then
-        echo "• Draft: $FullFileName file..";
-        continue
-      fi
-
-      # If the date is in the future, then it's scheduled
-      if (( $PostDateInt > $(date +"%Y%m%d") )); then
-        echo "• Scheduled: $FullFileName file..";
-        continue
-      fi
-
-      # Check if changed since last compile
-      LAST_MODIFIED_DATE=$(date -r "$f" +%s)
-      COMPILE_RECORD=$(grep "$FullFileName" $COMPILE_HISTORY_FILE)
-      COMPILE_RECORD_LMD=$(echo $COMPILE_RECORD | $SED 's/.*\ //')
-      #if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE < COMPILE_RECORD_LMD)); then
-      if [ "$COMPILE_RECORD" ] && (( LAST_MODIFIED_DATE <= COMPILE_RECORD_LMD )); then
-        echo "• Skipping: $FullFileName";
-        isCurrentNew=true
-        forRendering=false
-      else
-        $SED -i "/$(echo $FullFileName | $SED 's/ /\\ /g')/d" $COMPILE_HISTORY_FILE
-        echo "$FullFileName $LAST_MODIFIED_DATE" >> $COMPILE_HISTORY_FILE
-        echo "☶ $FullFileName file..";
-        isCurrentNew=false
-        forRendering=true
-      fi
-
-      echo "  - post/$Slug.html"
       # If page is for rendering
-      if [ $forRendering == true ] && ( [ -z "$1" ] || [ $isCurrentNew == false ] ); then
-
-        # Find available permalink
-        permalink="$_DIST/post/$Slug.html"
-
-        # No need to look if not new ( $isCurrentNew == false )
-        # $Slug will already be set correctly
-        if [ $isCurrentNew == true ]; then
-          find_permalink
-        fi
-
-        _TAGNAME=$_TAGNAME _TAGS=$tags render
-
-      else
-        title=$(grep -E "^\#\ (.*?)" "$f" | \
-          $SED 's/^\#\ \(.*\)/\1/' | \
-          $SED -r 's/\\(.)/\1/g' )
+      if [ $forRendering=true ]; then
+        render "$f" "$destination" "$title" "$slug" "$tags"
       fi
 
     else
-      title=$(grep -E "^\#\ (.*?)" "$f" | \
-        $SED 's/^\#\ \(.*\)/\1/' | \
-        $SED -r 's/\\(.)/\1/g' )
-      echo "+ $FullFileName file..";
+      echo "$T ∙ /post/$slug.html"
     fi # Checks if working on tag index
 
+    let post_index++
+
     # Finally insert to the current index page
-    _DIST=$_DIST _TAGNAME=$_TAGNAME _TAGS=$tags index_insert
+    _DIST=$_DIST _TAGNAME=$_TAGNAME \
+      index_insert "$f" "$slug" "$title"\
+      $total_post_count $total_page_count $post_index
 
   done
+
+  echo
 }
 
 # Clean DIST folder first
@@ -359,17 +175,19 @@ _DIST=$DIST begin "${fileList[@]}"
 
 # Now generate indexes for tags
 OIFS="$IFS"
-if compgen -G "/tmp/jennytag_*"; then
-  for i in `ls /tmp/jennytag_*`; do
-    tagName=`echo $i | $SED "s/\/tmp\/jennytag_//"`
-    mkdir -p $DIST/tag/$tagName
+if compgen -G "$TAGS_TEMP_DIR/*" > /dev/null; then
+  for i in `ls $TAGS_TEMP_DIR/*`; do
+    tag_name=$(basename $i)
+    mkdir -p $DIST/tag/$tag_name
     IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
-    _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
+    _DIST=$DIST/tag/$tag_name _TAGNAME=$tag_name begin "${fileList[@]}"
   done
 fi
 IFS="$OIFS"
 
 # Run the user defined hook
 [ "$(type -t post_hook)" = function ] && post_hook
+
+echo "$T Your rendered files are at $DIST"
 
 exit 0
