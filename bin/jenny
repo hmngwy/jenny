@@ -6,19 +6,13 @@ BLOG_LOCK=$(pwd)/.bloglock
 SOURCE_TEMP_FILE=$(mktemp)
 RENDER_TEMP_FILE=$(mktemp)
 TAGS_TEMP_DIR=$(mktemp -d)
-SHARE_DIR=/usr/local/share/jenny
 T="[jenny]"
 
-# Use project dir when symlinked
-if [[ "$(uname -a)" == *"Darwin"* ]]; then
-  SCRIPT_DIR=$(dirname "$(readlink $(which $BASH_SOURCE))")
-else
-  SCRIPT_DIR=$(dirname -- "$(readlink -e -- $BASH_SOURCE)")
-fi
+SHARE_DIR=$(echo $0 | rev | cut -d '/' -f3- | rev)/share/jenny
 
 # Load library
-source $SCRIPT_DIR/lib/helpers.sh
-source $SCRIPT_DIR/lib/components.sh
+source $SHARE_DIR/lib/helpers.sh
+source $SHARE_DIR/lib/components.sh
 
 # Load configuration on current dir
 if source_blogrc; then
@@ -27,16 +21,8 @@ if source_blogrc; then
   # Set defaults if not set in .blogrc
   [ -z $POSTS_PER_PAGE ] && POSTS_PER_PAGE=5
   [ -z $DIST ] && DIST=$PWD/.dist
-
-  if is_installed; then
-    # Installed, use installation path
-    [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
-    [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SHARE_DIR/lib/md2html.awk"
-  else
-    # Not installed, use project path
-    [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SCRIPT_DIR/share/layout
-    [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SCRIPT_DIR/share/lib/md2html.awk"
-  fi
+  [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
+  [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SHARE_DIR/lib/md2html.awk"
 
   # Sets up directory
   touch $BLOG_LOCK
