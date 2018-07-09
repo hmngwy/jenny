@@ -114,6 +114,9 @@ begin () {
         continue
       fi
 
+      local content_sum=$(cat "$f" | md5)
+      local filename_sum=$(echo "$f" | md5)
+
       # Grab the tags
       tags=$(get_tags "$f")
       for i in $tags; do
@@ -121,12 +124,12 @@ begin () {
       done
 
       forRendering=false
-      if is_new "$f"; then
+      if is_new "$filename_sum"; then
         echo "$T ☶ $full_file_name"
         forRendering=true
       else
         # not new
-        if is_changed "$f"; then
+        if is_changed "$filename_sum $content_sum"; then
           echo "$T ↑ $full_file_name"
           forRendering=true
         else
@@ -134,8 +137,6 @@ begin () {
         fi
       fi
 
-      local content_sum=$(cat "$f" | md5)
-      local filename_sum=$(echo "$f" | md5)
       echo "$filename_sum $content_sum" >> $BLOG_LOCK
 
       # If page is for rendering

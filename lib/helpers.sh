@@ -146,8 +146,7 @@ function get_last_modified_timestamp() {
 }
 
 function is_new() {
-	local filename_sum=$(echo "$1" | md5)
-	grep $filename_sum $BLOG_LOCK > /dev/null
+	grep $1 $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0 # is new
 	else
@@ -156,9 +155,7 @@ function is_new() {
 }
 
 function is_changed() {
-	local filename_sum=$(echo "$1" | md5)
-	local content_sum=$(cat "$1" | md5)
-	grep "$filename_sum $content_sum" $BLOG_LOCK > /dev/null
+	grep "$1 $2" $BLOG_LOCK > /dev/null
 	if [ ! $? -eq 0 ]; then
 		return 0 # is changed
 	else
