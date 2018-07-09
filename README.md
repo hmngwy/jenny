@@ -72,6 +72,7 @@ Finally, run `(cd ~/blog; jenny)`
 ### Other Settings
 
 - To install into a custom location do: `make install PREFIX=~/your/path`
+- To symlink into your bin folder: `make sym-install [PREFIX=~/your/path]`
 - To uninstall `make uninstall` in the project folder
 - To configure posts per page: `echo "POSTS_PER_PAGE=10" >> ~/blog/.blogrc`
 - To use your own markdown parser: `echo "MARKDOWN_COMMAND=multimarkdown" >> ~/blog/.blogrc`

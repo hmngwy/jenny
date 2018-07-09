@@ -3,6 +3,10 @@ PREFIX?=/usr/local
 BIN=${PREFIX}/bin
 SHARE=${PREFIX}/share
 
+sym-install:
+		@echo "Symlinking jenny script"
+		ln -s $(pwd)/bin/jenny $(BIN)/jenny
+
 install:
 		@echo "Installing jenny script"
 		install -m 755 ./bin/jenny $(BIN)/
