@@ -70,8 +70,7 @@ fi
 # Declare GlobalVariables
 full_file_name=""
 Slug=""
-PostCount=0
-PageCount=0
+page_index=0
 declare -a IndexList
 
 while getopts ":d:p:l:" opt; do
@@ -98,8 +97,8 @@ begin () {
   local total_page_count=$(get_total_page_count $total_post_count $POSTS_PER_PAGE)
 
   # Reset variables
-  PostCount=0
-  PageCount=0
+  local post_index=0
+  page_index=0
 
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
@@ -156,8 +155,12 @@ begin () {
       echo "$T - " $(get_full_filename "$f")
     fi # Checks if working on tag index
 
+    let post_index++
+
     # Finally insert to the current index page
-    _DIST=$_DIST _TAGNAME=$_TAGNAME index_insert "$f" "$slug" "$title" $total_post_count $total_page_count
+    _DIST=$_DIST _TAGNAME=$_TAGNAME \
+      index_insert "$f" "$slug" "$title"\
+      $total_post_count $total_page_count $post_index
 
   done
 

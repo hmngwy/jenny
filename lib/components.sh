@@ -36,6 +36,7 @@ index_insert () {
   local title=$3
   local total_post_count=$4
   local total_page_count=$5
+  local post_index=$6
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
 
@@ -49,17 +50,12 @@ index_insert () {
   # Create the export line for the index.sh template
   IndexList+=("POST_URL=\"/post/$slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$post_date\" POST_DATE_RFC822=\"$post_date_rfc822\" TAGNAME=\"$_TAGNAME\"")
 
-  # Count the posts so we can limit them per page
-  let PostCount++
-
-  page=$((($PostCount+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
-  isNewPage=$(( $PostCount % $POSTS_PER_PAGE ))
+  page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
+  isNewPage=$(( $post_index % $POSTS_PER_PAGE ))
 
   # Create page when we have enough for a page
   # Or when we don't have any more
-  if (( $isNewPage == 0 )) || (( $PostCount == $total_post_count )); then
-    echo "$T CREATED PAGE $page"
-    echo ""
+  if (( $isNewPage == 0 )) || (( $post_index == $total_post_count )); then
 
     # Add the older page nav
     [[ $(( page - 1 )) > 0 ]] && PAGE_OLD="$root/page/$(( page - 1 )).html" || PAGE_OLD=""
@@ -71,7 +67,7 @@ index_insert () {
       PAGE_NEW="$root/page/$(( page + 1 )).html"
     fi
 
-    let PageCount++
+    let page_index++
 
     # This is where we should generate the heredocs template for index
     if (( $page == $total_page_count )); then
