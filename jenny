@@ -68,10 +68,8 @@ fi
 [ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
 
 # Declare GlobalVariables
-FullFileName=""
+full_file_name=""
 Slug=""
-TotalPostCount=0
-TotalPageCount=0
 PostCount=0
 PageCount=0
 declare -a IndexList
@@ -96,8 +94,8 @@ begin () {
   # Grabbing the array argument
   local list=("$@")
 
-  TotalPostCount=$(get_total_post_count $@)
-  TotalPageCount=$(get_total_page_count $TotalPostCount $POSTS_PER_PAGE)
+  local total_post_count=$(get_total_post_count $@)
+  local total_page_count=$(get_total_page_count $total_post_count $POSTS_PER_PAGE)
 
   # Reset variables
   PostCount=0
@@ -106,6 +104,7 @@ begin () {
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
 
+    local full_file_name=$(get_full_filename "$f")
     local title=$(get_title "$f")
     local slug=$(get_slug "$f")
     local destination="$_DIST/post/$slug.html"
@@ -114,12 +113,12 @@ begin () {
     if [ -z "$_TAGNAME" ]; then
 
       if is_draft "$f"; then
-        echo "$T • Draft: $(get_full_filename "$f") file..";
+        echo "$T • Draft: $full_file_name file..";
         continue
       fi
 
       if is_scheduled "$f"; then
-        echo "$T • Scheduled: $(get_full_filename "$f") file..";
+        echo "$T • Scheduled: $full_file_name file..";
         continue
       fi
 
@@ -129,20 +128,17 @@ begin () {
         echo "$f" >> "$TAGS_TEMP_DIR/$i"
       done
 
-      # Grab file details
-      local FullFileName=$(get_full_filename "$f")
-
       forRendering=false
       if is_new "$f"; then
-        echo "$T ☶ $FullFileName"
+        echo "$T ☶ $full_file_name"
         forRendering=true
       else
         # not new
         if is_changed "$f"; then
-          echo "$T ↑ $FullFileName"
+          echo "$T ↑ $full_file_name"
           forRendering=true
         else
-          echo "$T - $FullFileName"
+          echo "$T - $full_file_name"
         fi
       fi
 
@@ -152,10 +148,8 @@ begin () {
 
       # If page is for rendering
       if [ $forRendering=true ]; then
-
         echo "$T   /post/$slug.html"
         render "$f" "$destination" "$title" "$slug" "$tags"
-
       fi
 
     else
@@ -163,7 +157,7 @@ begin () {
     fi # Checks if working on tag index
 
     # Finally insert to the current index page
-    _DIST=$_DIST _TAGNAME=$_TAGNAME index_insert "$f" "$slug" "$title"
+    _DIST=$_DIST _TAGNAME=$_TAGNAME index_insert "$f" "$slug" "$title" $total_post_count $total_page_count
 
   done
 

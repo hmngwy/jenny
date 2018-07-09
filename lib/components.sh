@@ -34,6 +34,8 @@ index_insert () {
   local file=$1
   local slug=$2
   local title=$3
+  local total_post_count=$4
+  local total_page_count=$5
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
 
@@ -55,7 +57,7 @@ index_insert () {
 
   # Create page when we have enough for a page
   # Or when we don't have any more
-  if (( $isNewPage == 0 )) || (( $PostCount == $TotalPostCount )); then
+  if (( $isNewPage == 0 )) || (( $PostCount == $total_post_count )); then
     echo "$T CREATED PAGE $page"
     echo ""
 
@@ -63,7 +65,7 @@ index_insert () {
     [[ $(( page - 1 )) > 0 ]] && PAGE_OLD="$root/page/$(( page - 1 )).html" || PAGE_OLD=""
 
     # Add the newer page nav
-    if (( $page+1 == $TotalPageCount )); then
+    if (( $page+1 == $total_page_count )); then
       PAGE_NEW="$root/"
     else
       PAGE_NEW="$root/page/$(( page + 1 )).html"
@@ -72,13 +74,13 @@ index_insert () {
     let PageCount++
 
     # This is where we should generate the heredocs template for index
-    if (( $page == $TotalPageCount )); then
+    if (( $page == $total_page_count )); then
       # This is the generation for the main index, i.e. /
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
-      if (( ${#IndexList[@]} < $POSTS_PER_PAGE )) && (( $TotalPageCount > 1 )); then
+      if (( ${#IndexList[@]} < $POSTS_PER_PAGE )) && (( $total_page_count > 1 )); then
         # If main index page is not full, fill from next page
         IFS='✂︎' read -r -a append <<< "$LastList"
-        IndexList="BREAK=$(($TotalPageCount - 1))✂︎$IndexList"
+        IndexList="BREAK=$(($total_page_count - 1))✂︎$IndexList"
         for (( idx=$POSTS_PER_PAGE ; idx>${#IndexList[@]} ; idx-- )) ; do
           IndexList="${append[idx]}✂︎$IndexList"
         done
