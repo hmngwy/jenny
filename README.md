@@ -24,61 +24,104 @@ Install Jenny to your local bin folder.
 make install
 ```
 
-Prepare the directory for your articles and build folder.
+Prepare the directory for your blog posts.
 
 ```
-mkdir -p ~/blog/.dist
+mkdir -p ~/blog && cd ~/blog
+```
+
+Create a configuration file.
+
+```
+cat <<EOT >> .blogrc
+BLOG_HOST="example.com"
+BLOG_TITLE="My Blog"
+EOT
 ```
 
 Create a file with a date so that Jenny recognizes it as a published post.
 
 ```
-cat <<EOT >> "~/blog/$(date +%Y-%m-%d) first-post.md"
+cat <<EOT >> "$(date +%Y-%m-%d) hello-world.md"
 # Hello World
 
 Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-Create a .blogrc file to tell Jenny where the build folder is.
-
-```
-echo "DIST=~/blog/.dist" >> ~/blog/.blogrc
-```
-
-Also, let it know the host name and title of your site.
-
-```
-echo "BLOG_HOST=\"example.com\"" >> ~/blog/.blogrc
-echo "BLOG_TITLE=\"Example Title\"" >> ~/blog/.blogrc
-```
-
-Finally, run `(cd ~/blog; jenny)`
+Finally, run `jenny`.
 
 ### Customization
 
-1. Copy the layout folder and modify the contents to your liking, make sure to retain existing template tags
+From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
 
-   ```
-   cp -R ./layout ~/blog/.layout
-   ```
+```cp -R ./share/jenny/layout ~/blog/.layout```
 
-2. Let Jenny know where to find your own layout files
+Let Jenny know where to find your customized layout files.
 
-   ```
-   echo "LAYOUT_DIR=~/blog/.layout" >> ~/blog/.blogrc
-   ```
+```
+cat <<EOT >> .blogrc
+LAYOUT_DIR=~/blog/.layout
+EOT
+```
 
 ### Other Settings
 
-- To install into a custom location do: `make install PREFIX=~/your/path`
-- To symlink into your bin folder: `make sym-install [PREFIX=~/your/path]`
-- To uninstall `make uninstall` in the project folder
-- To configure posts per page: `echo "POSTS_PER_PAGE=10" >> ~/blog/.blogrc`
-- To use your own markdown parser: `echo "MARKDOWN_COMMAND=multimarkdown" >> ~/blog/.blogrc`
-- To run a script after the build process, write a `post_hook` function in .blogrc
-- To use tags add `tags: tagname anothertag` into a post where tagname is filename friendly
-- To override `.blogrc` settings use command line arguments: `-d` for dist folder, `-p` for posts per page, `-l` for layout folder
+To install into a custom location do: 
+
+```make install PREFIX=~/.local```
+
+To soft install or symlink into your bin folder:
+
+```make sym-install [PREFIX=~/your/path]```
+
+To uninstall, in the project folder run:
+
+```make uninstall```
+
+To configure posts per page:
+
+```
+cat <<EOT >> .blogrc
+POSTS_PER_PAGE=10
+EOT
+```
+
+To use your own markdown parser, set `MARKDOWN_COMMAND`: 
+
+```
+cat <<EOT >> .blogrc
+MARKDOWN_COMMAND=multimarkdown
+EOT
+```
+
+To run a script after the build process, write a `post_hook` function in .blogrc:
+
+```
+cat << EOF >> .blogrc
+function post_hook() {
+  echo "Done!"
+}
+EOF
+```
+
+To set a different build folder, set `DIST`:
+
+```
+cat << EOF >> .blogrc
+DIST=~/blog/.dist
+EOF
+```
+
+To use tags add the below into a post where `tagname` is both filename and URL friendly:
+
+```tags: tagname anothertag```
+
+To override `.blogrc` settings use command line arguments: 
+
+- `-d` for dist folder
+- `-p` for posts per page
+- `-l` for layout folder
 
 ### Handy Shortcuts
 
