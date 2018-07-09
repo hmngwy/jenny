@@ -82,7 +82,11 @@ done
 
 begin () {
 
-  echo "$T Working in $_DIST"
+  if [ -z "$_TAGNAME" ]; then
+    echo "$T Generating main index"
+  else
+    echo "$T Generating $_TAGNAME tag index"
+  fi
 
   # Grabbing the array argument
   local list=("$@")
@@ -117,36 +121,35 @@ begin () {
       local content_sum=$(cat "$f" | md5)
       local filename_sum=$(echo "$f" | md5)
 
+      echo "$T ☶ $full_file_name"
+      forRendering=false
+      if is_new "$filename_sum"; then
+        forRendering=true
+        echo "$T + /post/$slug.html"
+        echo "$filename_sum $content_sum" >> $BLOG_LOCK
+      else
+        # not new
+        if is_changed "$filename_sum $content_sum"; then
+          echo "$T ↑ $full_file_name"
+          $SED -i "/$filename_sum/d" $BLOG_LOCK
+          echo "$filename_sum $content_sum" >> $BLOG_LOCK
+          forRendering=true
+        fi
+      fi
+
       # Grab the tags
       tags=$(get_tags "$f")
       for i in $tags; do
         echo "$f" >> "$TAGS_TEMP_DIR/$i"
       done
 
-      forRendering=false
-      if is_new "$filename_sum"; then
-        echo "$T ☶ $full_file_name"
-        forRendering=true
-      else
-        # not new
-        if is_changed "$filename_sum $content_sum"; then
-          echo "$T ↑ $full_file_name"
-          forRendering=true
-        else
-          echo "$T - $full_file_name"
-        fi
-      fi
-
-      echo "$filename_sum $content_sum" >> $BLOG_LOCK
-
       # If page is for rendering
       if [ $forRendering=true ]; then
-        echo "$T   /post/$slug.html"
         render "$f" "$destination" "$title" "$slug" "$tags"
       fi
 
     else
-      echo "$T - " $(get_full_filename "$f")
+      echo "$T ∙ /post/$slug.html"
     fi # Checks if working on tag index
 
     let post_index++
@@ -165,7 +168,7 @@ begin () {
 _DIST=$DIST clean
 
 # Get files in current directory
-local fileList=(*.md)
+fileList=(*.md)
 
 # Start generation
 _DIST=$DIST begin "${fileList[@]}"
@@ -174,15 +177,17 @@ _DIST=$DIST begin "${fileList[@]}"
 OIFS="$IFS"
 if compgen -G "$TAGS_TEMP_DIR/*" > /dev/null; then
   for i in `ls $TAGS_TEMP_DIR/*`; do
-    tagName=$(basename $i)
-    mkdir -p $DIST/tag/$tagName
+    tag_name=$(basename $i)
+    mkdir -p $DIST/tag/$tag_name
     IFS=$'\r\n' GLOBIGNORE='*' command eval "fileList=(\$(cat $i))"
-    _DIST=$DIST/tag/$tagName _TAGNAME=$tagName begin "${fileList[@]}"
+    _DIST=$DIST/tag/$tag_name _TAGNAME=$tag_name begin "${fileList[@]}"
   done
 fi
 IFS="$OIFS"
 
 # Run the user defined hook
 [ "$(type -t post_hook)" = function ] && post_hook
+
+echo "$T Your rendered files are at $DIST"
 
 exit 0

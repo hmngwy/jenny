@@ -83,7 +83,7 @@ index_insert () {
         TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
 
-      echo "$T Generating feed.xml"
+      echo "$T ⌁ Generating RSS feed"
 
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \

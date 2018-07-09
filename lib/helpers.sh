@@ -155,11 +155,11 @@ function is_new() {
 }
 
 function is_changed() {
-	grep "$1 $2" $BLOG_LOCK > /dev/null
-	if [ ! $? -eq 0 ]; then
-		return 0 # is changed
-	else
+	grep "$1" $BLOG_LOCK > /dev/null
+	if [ $? -eq 0 ]; then
 		return 1
+	else
+		return 0
 	fi
 }
 
