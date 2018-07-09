@@ -28,7 +28,6 @@ render () {
     $LAYOUT_DIR/post.sh > $destination
 }
 
-
 # Inserts each article into an index or pagination page
 index_insert () {
   local file=$1
@@ -39,6 +38,8 @@ index_insert () {
   local post_index=$6
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
+  local page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
+  local is_page_new=$(( $post_index % $POSTS_PER_PAGE ))
 
   # If working on a tag index page, adjust pagination links
   if [ $_TAGNAME ]; then
@@ -50,12 +51,9 @@ index_insert () {
   # Create the export line for the index.sh template
   IndexList+=("POST_URL=\"/post/$slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$post_date\" POST_DATE_RFC822=\"$post_date_rfc822\" TAGNAME=\"$_TAGNAME\"")
 
-  page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
-  isNewPage=$(( $post_index % $POSTS_PER_PAGE ))
-
   # Create page when we have enough for a page
   # Or when we don't have any more
-  if (( $isNewPage == 0 )) || (( $post_index == $total_post_count )); then
+  if (( $is_page_new == 0 )) || (( $post_index == $total_post_count )); then
 
     # Add the older page nav
     [[ $(( page - 1 )) > 0 ]] && PAGE_OLD="$root/page/$(( page - 1 )).html" || PAGE_OLD=""
@@ -66,8 +64,6 @@ index_insert () {
     else
       PAGE_NEW="$root/page/$(( page + 1 )).html"
     fi
-
-    let page_index++
 
     # This is where we should generate the heredocs template for index
     if (( $page == $total_page_count )); then

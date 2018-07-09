@@ -98,7 +98,6 @@ begin () {
 
   # Reset variables
   local post_index=0
-  page_index=0
 
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
