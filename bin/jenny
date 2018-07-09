@@ -49,6 +49,7 @@ fi
 [ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
 [ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
 [ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
+[ "$(which md5sum)" ] && SUM=$(which md5sum) || SUM=$(which md5)
 
 # Declare GlobalVariables
 declare -a IndexList
@@ -104,8 +105,8 @@ begin () {
         continue
       fi
 
-      local content_sum=$(cat "$f" | md5)
-      local filename_sum=$(echo "$f" | md5)
+      local content_sum=$(cat "$f" | $SUM)
+      local filename_sum=$(echo "$f" | $SUM)
 
       echo "$T ☶ $full_file_name"
       forRendering=false
