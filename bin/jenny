@@ -8,11 +8,16 @@ RENDER_TEMP_FILE=$(mktemp)
 TAGS_TEMP_DIR=$(mktemp -d)
 T="[jenny]"
 
-SHARE_DIR=$(echo $0 | rev | cut -d '/' -f3- | rev)/share/jenny
+if readlink $0 > /dev/null; then
+  SHARE_DIR=$(readlink $0 | rev | cut -d '/' -f3- | rev)/share/jenny
+else
+  SHARE_DIR=$(echo $0 | rev | cut -d '/' -f3- | rev)/share/jenny
+fi
 
 # Load library
 source $SHARE_DIR/lib/helpers.sh
 source $SHARE_DIR/lib/components.sh
+
 
 # Load configuration on current dir
 if source_blogrc; then
@@ -142,10 +147,12 @@ begin () {
 
     let post_index++
 
+    local page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
+
     # Finally insert to the current index page
     _DIST=$_DIST _TAGNAME=$_TAGNAME \
-      index_insert "$f" "$slug" "$title"\
-      $total_post_count $total_page_count $post_index
+      index_insert "$f" "$slug" "$title" \
+      $total_post_count $total_page_count $post_index $page
 
   done
 

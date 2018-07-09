@@ -170,3 +170,22 @@ function get_title() {
     $SED 's/^\#\ \(.*\)/\1/' | \
     $SED -r 's/\\(.)/\1/g' )
 }
+
+function get_page_old_url() {
+  local page=$1
+  if [[ $(( page - 1 )) > 0 ]]; then
+    echo "$ROOT/page/$(( $page - 1 )).html"
+  else
+    echo ""
+  fi
+}
+
+function get_page_new_url() {
+  local page=$1
+  local total_page_count=$2
+  if [[ $(( page + 1 )) == $total_page_count ]]; then
+    echo "$ROOT/"
+  else
+    echo "$ROOT/page/$(( page + 1 )).html"
+  fi
+}

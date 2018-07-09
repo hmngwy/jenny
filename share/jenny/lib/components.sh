@@ -36,10 +36,10 @@ index_insert () {
   local total_post_count=$4
   local total_page_count=$5
   local post_index=$6
+  local page=$7
 
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
-  local page=$((($post_index+$POSTS_PER_PAGE-1)/$POSTS_PER_PAGE))
   local is_page_new=$(( $post_index % $POSTS_PER_PAGE ))
 
   # If working on a tag index page, adjust pagination links
@@ -57,14 +57,8 @@ index_insert () {
   if (( $is_page_new == 0 )) || (( $post_index == $total_post_count )); then
 
     # Add the older page nav
-    [[ $(( page - 1 )) > 0 ]] && PAGE_OLD="$root/page/$(( page - 1 )).html" || PAGE_OLD=""
-
-    # Add the newer page nav
-    if (( $page+1 == $total_page_count )); then
-      PAGE_NEW="$root/"
-    else
-      PAGE_NEW="$root/page/$(( page + 1 )).html"
-    fi
+    PAGE_OLD=$(ROOT=$root get_page_old_url $page )
+    PAGE_NEW=$(ROOT=$root get_page_new_url $page $total_page_count)
 
     # This is where we should generate the heredocs template for index
     if (( $page == $total_page_count )); then
@@ -91,10 +85,11 @@ index_insert () {
         BLOG_HOST=$BLOG_HOST \
         BLOG_TITLE=$BLOG_TITLE \
         $LAYOUT_DIR/rss2.sh > "$_DIST/feed.xml"
+
     else
       # This is the generation for paged indexes, i.e. page/*
       IndexList=$(join_by '✂︎' "${IndexList[@]}")
-      LastList=$IndexList
+      LastList=$IndexList # this is used in later loop iterations
       mkdir -p $_DIST/page
       LIST="$IndexList" \
         PAGE_NUM=$page \
