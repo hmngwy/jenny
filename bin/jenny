@@ -18,6 +18,25 @@ fi
 source $SHARE_DIR/lib/helpers.sh
 source $SHARE_DIR/lib/components.sh
 
+# Checks if user is on macOS and checks for dependencies
+# Also handles suppresion of this very message
+if is_utils_installed; then
+  echo -e "$T macOS users need ggrep, gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed grep\n"
+  echo -e "$T If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
+  exit 0
+fi
+
+# Use GNU utils if present
+[ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
+[ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
+[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
+[ "$(which md5)" ] && SUM=$(which md5) || SUM=$(which md5sum)
+[ "$(which ggrep)" ] && GREP=$(which ggrep) || GREP=$(which grep)
+
+function usage() {
+  echo "$(basename $0) usage:" && grep " .)\ #" $0 | sed 's/) #//'  | sed 's/\ */   -/' | sed 's/ | \*//'
+  exit 0
+}
 
 # Load configuration on current dir
 if source_blogrc; then
@@ -28,6 +47,40 @@ if source_blogrc; then
   [ -z $DIST ] && DIST=$PWD/.dist
   [ -z "$LAYOUT_DIR" ] && LAYOUT_DIR=$SHARE_DIR/layout
   [ -z "$MARKDOWN_COMMAND" ] && MARKDOWN_COMMAND="\$AWK -f \$SHARE_DIR/lib/md2html.awk"
+
+  while getopts ":d:p:l:m:vnc" opt; do
+    case $opt in
+      d) # ./dir   Override the build directory setting
+        DIST="$OPTARG"
+      ;;
+      l) # ./dir   Override layout directory setting
+        LAYOUT_DIR="$OPTARG"
+      ;;
+      p) # 10      Override posts per page setting
+        POSTS_PER_PAGE="$OPTARG"
+      ;;
+      m) # mmd     Override the markdown parser command setting
+        MARKDOWN_COMMAND="$OPTARG"
+      ;;
+      v) #         Display more information during building
+        VERBOSE="yes"
+      ;;
+      n) #         Ignore the .bloglock file when building
+        echo "$T Ignoring $BLOG_LOCK"
+        BLOG_LOCK=/dev/null
+      ;;
+      c) #         Empty out the build folder prior to building
+        echo "$T Cleaning $DIST"
+        rm -r $DIST
+      ;;
+      h | *) #         Show this help message
+        usage
+        exit 0
+      ;;
+      \?) echo "Invalid option -$OPTARG" >&2
+      ;;
+    esac
+  done
 
   # Sets up directory
   touch $BLOG_LOCK
@@ -42,36 +95,23 @@ else
   exit 1
 fi
 
-# Checks if user is on macOS and checks for dependencies
-# Also handles suppresion of this very message
-if is_utils_installed; then
-  echo -e "$T macOS users need gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed coreutils\n"
-  echo -e "$T If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
-  exit 0
-fi
+[ ! -z "$VERBOSE" ] && echo
+[ ! -z "$VERBOSE" ] && echo "$T Build directory: $DIST"
+[ ! -z "$VERBOSE" ] && echo "$T Layout directory: $LAYOUT_DIR"
+[ ! -z "$VERBOSE" ] && echo "$T Posts per page: $POSTS_PER_PAGE"
+[ ! -z "$VERBOSE" ] && echo "$T Markdown command: $MARKDOWN_COMMAND"
+[ ! -z "$VERBOSE" ] && echo
 
-# Use GNU utils if present
-[ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
-[ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
-[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
-[ "$(which md5)" ] && SUM=$(which md5) || SUM=$(which md5sum)
-[ "$(which ggrep)" ] && GREP=$(which ggrep) || GREP=$(which grep)
+[ ! -z "$VERBOSE" ] && echo "$T grep: ${GREP}"
+[ ! -z "$VERBOSE" ] && echo "$T sed: ${SED}"
+[ ! -z "$VERBOSE" ] && echo "$T awk: ${AWK}"
+[ ! -z "$VERBOSE" ] && echo "$T date: ${DATE}"
+[ ! -z "$VERBOSE" ] && echo "$T sum: ${SUM}"
+[ ! -z "$VERBOSE" ] && echo
 
 # Declare GlobalVariables
 declare -a IndexList
 
-while getopts ":d:p:l:" opt; do
-  case $opt in
-    d) DIST="$OPTARG"
-    ;;
-    p) POSTS_PER_PAGE="$OPTARG"
-    ;;
-    l) LAYOUT_DIR="$OPTARG"
-    ;;
-    \?) echo "Invalid option -$OPTARG" >&2
-    ;;
-  esac
-done
 
 begin () {
 
