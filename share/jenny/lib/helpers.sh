@@ -14,7 +14,7 @@ function source_blogrc() {
 # Check if darwin
 function is_utils_installed() {
   if [ -z "$SUPPRESS_UTILS_WARN" ] && \
-    [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
+    [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" || -z "$(which ggrep)" || -z "$(which gdate)" ) ]]; then
     return 0
   else
     return 1
