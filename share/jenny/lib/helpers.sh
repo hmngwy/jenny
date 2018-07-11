@@ -14,7 +14,7 @@ function source_blogrc() {
 # Check if darwin
 function is_utils_installed() {
   if [ -z "$SUPPRESS_UTILS_WARN" ] && \
-    [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" ) ]]; then
+    [[ "$(uname -a)" == *"Darwin"*  && ( -z "$(which gsed)" || -z "$(which gawk)" || -z "$(which ggrep)" || -z "$(which gdate)" ) ]]; then
     return 0
   else
     return 1
@@ -169,4 +169,23 @@ function get_title() {
   echo $($GREP -E "^\#\ (.*?)" "$1" | \
     $SED 's/^\#\ \(.*\)/\1/' | \
     $SED -r 's/\\(.)/\1/g' )
+}
+
+function get_page_old_url() {
+  local page=$1
+  if [[ $(( page - 1 )) > 0 ]]; then
+    echo "$ROOT/page/$(( $page - 1 )).html"
+  else
+    echo ""
+  fi
+}
+
+function get_page_new_url() {
+  local page=$1
+  local total_page_count=$2
+  if [[ $(( page + 1 )) == $total_page_count ]]; then
+    echo "$ROOT/"
+  else
+    echo "$ROOT/page/$(( page + 1 )).html"
+  fi
 }

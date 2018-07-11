@@ -67,7 +67,7 @@ EOT
 
 ### Other Settings
 
-To install into a custom location do: 
+To install into a custom location do:
 
 ```make install PREFIX=~/.local```
 
@@ -87,7 +87,7 @@ POSTS_PER_PAGE=10
 EOT
 ```
 
-To use your own markdown parser, set `MARKDOWN_COMMAND`: 
+To use your own markdown parser, set `MARKDOWN_COMMAND`:
 
 ```
 cat <<EOT >> .blogrc
@@ -117,11 +117,19 @@ To use tags add the below into a post where `tagname` is both filename and URL f
 
 ```tags: tagname anothertag```
 
-To override `.blogrc` settings use command line arguments: 
+To override `.blogrc` settings use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
-- `-d` for dist folder
-- `-p` for posts per page
-- `-l` for layout folder
+```
+jenny usage:
+   -d ./dir   Override the build directory setting
+   -p 10      Override posts per page setting
+   -l ./dir   Override layout directory setting
+   -m mmd     Override the markdown parser command setting
+   -v         Display more information during building
+   -n         Ignore the .bloglock file when building
+   -c         Empty out the build folder prior to building
+   -h         Show this help message
+```
 
 ### Handy Shortcuts
 
