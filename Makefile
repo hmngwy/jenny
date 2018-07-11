@@ -5,7 +5,7 @@ SHARE=${PREFIX}/share
 
 sym-install:
 		@echo "Symlinking jenny script"
-		ln -s $(pwd)/bin/jenny $(BIN)/jenny
+		ln -s $(shell pwd)/bin/jenny $(BIN)/jenny
 
 install:
 		@echo "Installing jenny script"
