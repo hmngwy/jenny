@@ -1,6 +1,6 @@
 # Jenny
 
-_Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, but provide some modern conveniences.
+_Jenny_ is a static blog generator. Its aim is to work with minimal requirements and a small footprint while providing some modern conveniences.
 
 - [x] Lightweight default theme
 - [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk)
@@ -11,7 +11,10 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [x] Forward-posting, i.e. ignores posts with dates in the future
 - [x] Tags support
 - [x] Modifiable installation prefix
-- [x] Define run-time options in command arguments
+- [x] Define run-time settings in command arguments
+- [x] Include static directories in build
+- [x] Unique URL slug generation
+- [x] Render only changed or new posts
 - [x] RSS/Atom feed
 - [ ] Tests
 
@@ -129,7 +132,7 @@ tags: tagname anothertag
 
 ## Command Line Arguments
 
-To override `.blogrc` settings use command line arguments. Other options are also available, use `jenny -h` to display the message below:
+To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
 ```
 jenny usage:
