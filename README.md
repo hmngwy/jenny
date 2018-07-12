@@ -3,7 +3,7 @@
 _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, but provide some modern conveniences.
 
 - [x] Lightweight default theme
-- [x] Markdown with Footnotes support, care of a modified [Markdown.awk](https://bitbucket.org/yiyus/md2html.awk)
+- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk)
 - [x] Basic pagination with fixed page numbers
 - [x] Plug your own Markdown parser
 - [x] Heredocs-based template syntax
@@ -30,6 +30,18 @@ Prepare the directory for your blog posts.
 mkdir -p ~/blog && cd ~/blog
 ```
 
+Use the subcommand below to semi-automatically initialize your blog folder with a `.blogrc` file and a sample first post.
+
+```
+jenny init
+```
+
+Or you can proceed below to manually initialize your blog folder.
+
+#### Manual Initialization
+
+_You can skip this step if you ran `jenny init`._
+
 Create a configuration file.
 
 ```
@@ -49,7 +61,9 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-Finally, run `jenny`.
+#### Generate
+
+Run `jenny` on your blog directory.
 
 ### Customization
 
@@ -137,13 +151,10 @@ Add these to your aliases:
 
 ```bash
 # Publish file with current date
-publish () {
-  mv $1 "$(date +%Y-%m-%d) $1"
-}
+jenny publish filename.md
+
 # Edit file without typing date/full filename
-edit () {
-  editor $(ls | grep $1)
-}
+jenny edit partial-filename
 ```
 
 ### Credits

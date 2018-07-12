@@ -17,11 +17,20 @@ fi
 # Load library
 source $SHARE_DIR/lib/helpers.sh
 source $SHARE_DIR/lib/components.sh
+source $SHARE_DIR/lib/subcommands.sh
+
+BASENAME=$(basename $0)
+SUBCOMMAND=$1
+type sub_${SUBCOMMAND} >/dev/null 2>/dev/null
+
+if [ $? -eq 0 ]; then
+  sub_${SUBCOMMAND} $@
+fi
 
 # Checks if user is on macOS and checks for dependencies
 # Also handles suppresion of this very message
 if is_utils_installed; then
-  echo -e "$T macOS users need ggrep, gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed grep gdate\n"
+  echo -e "$T macOS users need ggrep, gsed, gawk, and gdate, install them via: \n\n  brew install gawk gnu-sed grep coreutils\n"
   echo -e "$T If you installed them with --with-default-names, i.e. as sed and awk, then add the below to your .blogrc file to suppress this warning:\n\n  SUPPRESS_UTILS_WARN=1\n"
   exit 0
 fi
