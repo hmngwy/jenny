@@ -33,7 +33,7 @@ Prepare the directory for your blog posts.
 mkdir -p ~/blog && cd ~/blog
 ```
 
-Use the subcommand below to semi-automatically initialize your blog folder with a `.blogrc` file and a sample first post.
+Use the subcommand below to initialize your blog folder with a `.blogrc` file and a sample first post.
 
 ```
 jenny init
@@ -68,23 +68,35 @@ EOT
 
 Run `jenny` on your blog directory.
 
-## Customization
+## Command Line Arguments
 
-From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
-
-```cp -R ./share/jenny/layout ~/blog/.layout```
-
-Let Jenny know where to find your customized layout files.
+To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
 ```
-cat <<EOT >> .blogrc
-LAYOUT_DIR=~/blog/.layout
-EOT
+jenny usage:
+   -d ./dir   Override the build directory setting
+   -p 10      Override posts per page setting
+   -l ./dir   Override layout directory setting
+   -m mmd     Override the markdown parser command setting
+   -v         Display more information during building
+   -n         Ignore the .bloglock file when building
+   -c         Empty out the build folder prior to building
+   -h         Show this help message
+```
+
+### Handy Shortcuts
+
+```bash
+# Publish file with current date
+jenny publish filename.md
+
+# Edit file without typing date/full filename
+jenny edit partial-filename
 ```
 
 ## Other Settings
 
-To install into a custom location do: ```make install PREFIX=~/.local```
+To install into a custom location do: ```make install [PREFIX=~/.local]```
 
 To soft install or symlink into your bin folder: ```make sym-install [PREFIX=~/your/path]```
 
@@ -124,44 +136,36 @@ DIST=~/blog/.dist
 EOF
 ```
 
+## Post Formatting
+
+Titles are Markdown H1s. Use Multimarkdown footnotes syntax.
+
 To use tags add the below into a post where `tagname` is both filename and URL friendly:
 
 ```
 tags: tagname anothertag
 ```
 
-## Command Line Arguments
+## Customization
 
-To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
+From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
+
+```cp -R ./share/jenny/layout ~/blog/.layout```
+
+Let Jenny know where to find your customized layout files.
 
 ```
-jenny usage:
-   -d ./dir   Override the build directory setting
-   -p 10      Override posts per page setting
-   -l ./dir   Override layout directory setting
-   -m mmd     Override the markdown parser command setting
-   -v         Display more information during building
-   -n         Ignore the .bloglock file when building
-   -c         Empty out the build folder prior to building
-   -h         Show this help message
+cat <<EOT >> .blogrc
+LAYOUT_DIR=~/blog/.layout
+EOT
 ```
 
-### Handy Shortcuts
-
-```bash
-# Publish file with current date
-jenny publish filename.md
-
-# Edit file without typing date/full filename
-jenny edit partial-filename
-```
-
-### Credits
+## Credits
 - Layout inspired by n-o-d-e.net
 - Some colors from Solarized by Ethan Schoonover
 - Makefile inspired by [moebiuseye/skf](https://github.com/moebiuseye/skf)
 
-### License
+## License
 
 MIT License
 
