@@ -16,7 +16,7 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [ ] Tests
 
 
-### Usage
+## Usage
 
 Install Jenny to your local bin folder.
 
@@ -38,7 +38,7 @@ jenny init
 
 Or you can proceed below to manually initialize your blog folder.
 
-#### Manual Initialization
+### Manual Initialization
 
 _You can skip this step if you ran `jenny init`._
 
@@ -61,11 +61,11 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-#### Generate
+### Generate
 
 Run `jenny` on your blog directory.
 
-### Customization
+## Customization
 
 From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
 
@@ -79,19 +79,13 @@ LAYOUT_DIR=~/blog/.layout
 EOT
 ```
 
-### Other Settings
+## Other Settings
 
-To install into a custom location do:
+To install into a custom location do: ```make install PREFIX=~/.local```
 
-```make install PREFIX=~/.local```
+To soft install or symlink into your bin folder: ```make sym-install [PREFIX=~/your/path]```
 
-To soft install or symlink into your bin folder:
-
-```make sym-install [PREFIX=~/your/path]```
-
-To uninstall, in the project folder run:
-
-```make uninstall```
+To uninstall, in the project folder run: ```make uninstall```
 
 To configure posts per page:
 
@@ -129,7 +123,11 @@ EOF
 
 To use tags add the below into a post where `tagname` is both filename and URL friendly:
 
-```tags: tagname anothertag```
+```
+tags: tagname anothertag
+```
+
+## Command Line Arguments
 
 To override `.blogrc` settings use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
@@ -146,8 +144,6 @@ jenny usage:
 ```
 
 ### Handy Shortcuts
-
-Add these to your aliases:
 
 ```bash
 # Publish file with current date
