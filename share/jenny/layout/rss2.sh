@@ -13,7 +13,7 @@ function list_item {
 cat << _LOOP_
 <item>
 	<title>$(echo $POST_TITLE)</title>
-  <link>http://$(echo $BLOG_HOST)$(echo $POST_URL)</link>
+  <link>$(echo $BLOG_HOST)$(echo $POST_URL)</link>
 	<description></description>
 	<pubDate>$(echo $POST_DATE_RFC822)</pubDate>
 </item>
@@ -25,7 +25,7 @@ cat << _EOF_
 <rss version="2.0">
 <channel>
   <title>$(echo $BLOG_TITLE)</title>
-  <link>http://$(echo $BLOG_HOST)</link>
+  <link>$(echo $BLOG_HOST)</link>
   <description></description>
 
 	$(index_loop)
