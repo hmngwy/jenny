@@ -82,17 +82,18 @@ function get_filename() {
 
 function get_slug() {
   local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
-	$GREP "$slug" $BLOG_LOCK > /dev/null
-	if [ $? -eq 0 ]; then
+  local filename_sum=$(echo "$f" | $SUM | cut -d ' ' -f 1)
+  $GREP "^$slug " $BLOG_LOCK > /dev/null
+  if [ $? -eq 0 ]; then
     # slug exists
     local i=2
-    while $GREP "$slug-$1" $BLOG_LOCK > /dev/null; do
+    while $GREP "^$slug-$i " $BLOG_LOCK > /dev/null; do
       let i++
     done
     echo "$slug-$i"
-	else
+  else
     echo $slug
-	fi
+  fi
 }
 
 function get_id() {
