@@ -1,9 +1,9 @@
 # Jenny
 
-_Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, but provide some modern conveniences.
+_Jenny_ is a static blog generator. Its aim is to work with minimal requirements and a small footprint while providing some modern conveniences.
 
 - [x] Lightweight default theme
-- [x] Markdown with Footnotes support, care of a modified [Markdown.awk](https://bitbucket.org/yiyus/md2html.awk)
+- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk)
 - [x] Basic pagination with fixed page numbers
 - [x] Plug your own Markdown parser
 - [x] Heredocs-based template syntax
@@ -11,12 +11,15 @@ _Jenny_ is a static blog generator. Its aim is to work with basic Linux tools, b
 - [x] Forward-posting, i.e. ignores posts with dates in the future
 - [x] Tags support
 - [x] Modifiable installation prefix
-- [x] Define run-time options in command arguments
+- [x] Define run-time settings in command arguments
+- [x] Include static directories in build
+- [x] Unique URL slug generation
+- [x] Render only changed or new posts
 - [x] RSS/Atom feed
 - [ ] Tests
 
 
-### Usage
+## Usage
 
 Install Jenny to your local bin folder.
 
@@ -29,6 +32,18 @@ Prepare the directory for your blog posts.
 ```
 mkdir -p ~/blog && cd ~/blog
 ```
+
+Use the subcommand below to initialize your blog folder with a `.blogrc` file and a sample first post.
+
+```
+jenny init
+```
+
+Or you can proceed below to manually initialize your blog folder.
+
+### Manual Initialization
+
+_You can skip this step if you ran `jenny init`._
 
 Create a configuration file.
 
@@ -49,35 +64,43 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-Finally, run `jenny`.
+### Generate
 
-### Customization
+Run `jenny` on your blog directory.
 
-From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
+## Command Line Arguments
 
-```cp -R ./share/jenny/layout ~/blog/.layout```
-
-Let Jenny know where to find your customized layout files.
+To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
 ```
-cat <<EOT >> .blogrc
-LAYOUT_DIR=~/blog/.layout
-EOT
+jenny usage:
+   -d ./dir   Override the build directory setting
+   -p 10      Override posts per page setting
+   -l ./dir   Override layout directory setting
+   -m mmd     Override the markdown parser command setting
+   -v         Display more information during building
+   -n         Ignore the .bloglock file when building
+   -c         Empty out the build folder prior to building
+   -h         Show this help message
 ```
 
-### Other Settings
+### Handy Shortcuts
 
-To install into a custom location do:
+```bash
+# Publish file with current date
+jenny publish filename.md
 
-```make install PREFIX=~/.local```
+# Edit file without typing date/full filename
+jenny edit partial-filename
+```
 
-To soft install or symlink into your bin folder:
+## Other Settings
 
-```make sym-install [PREFIX=~/your/path]```
+To install into a custom location do: ```make install [PREFIX=~/.local]```
 
-To uninstall, in the project folder run:
+To soft install or symlink into your bin folder: ```make sym-install [PREFIX=~/your/path]```
 
-```make uninstall```
+To uninstall, in the project folder run: ```make uninstall```
 
 To configure posts per page:
 
@@ -113,45 +136,36 @@ DIST=~/blog/.dist
 EOF
 ```
 
+## Post Formatting
+
+Titles are Markdown H1s. Use Multimarkdown footnotes syntax.
+
 To use tags add the below into a post where `tagname` is both filename and URL friendly:
 
-```tags: tagname anothertag```
-
-To override `.blogrc` settings use command line arguments. Other options are also available, use `jenny -h` to display the message below:
-
 ```
-jenny usage:
-   -d ./dir   Override the build directory setting
-   -p 10      Override posts per page setting
-   -l ./dir   Override layout directory setting
-   -m mmd     Override the markdown parser command setting
-   -v         Display more information during building
-   -n         Ignore the .bloglock file when building
-   -c         Empty out the build folder prior to building
-   -h         Show this help message
+tags: tagname anothertag
 ```
 
-### Handy Shortcuts
+## Customization
 
-Add these to your aliases:
+From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
 
-```bash
-# Publish file with current date
-publish () {
-  mv $1 "$(date +%Y-%m-%d) $1"
-}
-# Edit file without typing date/full filename
-edit () {
-  editor $(ls | grep $1)
-}
+```cp -R ./share/jenny/layout ~/blog/.layout```
+
+Let Jenny know where to find your customized layout files.
+
+```
+cat <<EOT >> .blogrc
+LAYOUT_DIR=~/blog/.layout
+EOT
 ```
 
-### Credits
+## Credits
 - Layout inspired by n-o-d-e.net
 - Some colors from Solarized by Ethan Schoonover
 - Makefile inspired by [moebiuseye/skf](https://github.com/moebiuseye/skf)
 
-### License
+## License
 
 MIT License
 
