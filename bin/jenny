@@ -76,7 +76,7 @@ if source_blogrc; then
       ;;
       n) #         Ignore the .bloglock file when building
         echo "$T Ignoring $BLOG_LOCK"
-        BLOG_LOCK=/dev/null
+        BLOG_LOCK_IGNORE=1
       ;;
       c) #         Empty out the build folder prior to building
         echo "$T Cleaning $DIST"
@@ -161,11 +161,11 @@ begin () {
       fi
 
       local content_sum=$(cat "$f" | $SUM | cut -d ' ' -f 1)
-      local filename_sum=$(echo "$f" | $SUM | cut -d ' ' -f 1)
+      local filename_sum=$(echo "$full_file_name" | $SUM | cut -d ' ' -f 1)
 
       echo "$T ☶ $full_file_name"
       forRendering=false
-      if is_new "$filename_sum"; then
+      if is_new "$filename_sum" && [ ! -z $BLOG_LOCK_IGNORE ]; then
         forRendering=true
         echo "$T + /post/$slug.html"
         echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
@@ -216,6 +216,7 @@ fileList=(*.md)
 
 # Start generation
 _DIST=$DIST begin "${fileList[@]}"
+BLOG_LOCK=$(pwd)/.bloglock
 
 # Now generate indexes for tags
 OIFS="$IFS"
