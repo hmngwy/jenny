@@ -82,7 +82,16 @@ function get_filename() {
 
 function get_slug() {
   local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
-  local filename_sum=$(echo "$f" | $SUM | cut -d ' ' -f 1)
+  local filename_sum=$(get_full_filename "$1" | $SUM | cut -d ' ' -f 1)
+
+  if [ ! -z $_TAGNAME ]; then
+    local match=$($GREP " $filename_sum " $BLOG_LOCK)
+    if [ $? -eq 0 ]; then
+      echo $match | cut -d " " -f 1
+      exit 0
+    fi
+  fi
+
   $GREP "^$slug " $BLOG_LOCK > /dev/null
   if [ $? -eq 0 ]; then
     # slug exists
