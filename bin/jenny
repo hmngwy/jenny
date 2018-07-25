@@ -141,7 +141,6 @@ begin () {
 
   # Loop through file list in expanded array
   for f in "${list[@]}"; do
-
     local full_file_name=$(get_full_filename "$f")
     local filename_sum=$(echo "$full_file_name" | $SUM | cut -d ' ' -f 1)
     local title=$(get_title "$f")
@@ -170,8 +169,8 @@ begin () {
         echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
       else
         # not new
+        local slug=$(get_existing_slug "$filename_sum")
         if is_changed "$filename_sum $content_sum"; then
-          local slug=$(get_existing_slug "$filename_sum")
           echo "$T ↑ /post/$slug.html"
           $SED -i "/$filename_sum/d" $BLOG_LOCK
           echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
