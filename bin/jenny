@@ -75,8 +75,8 @@ if source_blogrc; then
         VERBOSE="yes"
       ;;
       n) #         Ignore the .bloglock file when building
-        echo "$T Ignoring $BLOG_LOCK"
-        BLOG_LOCK_IGNORE=1
+        echo "$T Emptying $BLOG_LOCK"
+        : > $BLOG_LOCK
       ;;
       c) #         Empty out the build folder prior to building
         echo "$T Cleaning $DIST"
@@ -143,9 +143,8 @@ begin () {
   for f in "${list[@]}"; do
 
     local full_file_name=$(get_full_filename "$f")
+    local filename_sum=$(echo "$full_file_name" | $SUM | cut -d ' ' -f 1)
     local title=$(get_title "$f")
-    local slug=$(get_slug "$f")
-    local destination="$_DIST/post/$slug.html"
 
     # Process source files if not working on tag index
     if [ -z "$_TAGNAME" ]; then
@@ -161,17 +160,18 @@ begin () {
       fi
 
       local content_sum=$(cat "$f" | $SUM | cut -d ' ' -f 1)
-      local filename_sum=$(echo "$full_file_name" | $SUM | cut -d ' ' -f 1)
 
       echo "$T ☶ $full_file_name"
       forRendering=false
-      if is_new "$filename_sum" && [ ! -z $BLOG_LOCK_IGNORE ]; then
+      if is_new "$filename_sum"; then
+        local slug=$(get_unique_slug "$f")
         forRendering=true
         echo "$T + /post/$slug.html"
         echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
       else
         # not new
         if is_changed "$filename_sum $content_sum"; then
+          local slug=$(get_existing_slug "$filename_sum")
           echo "$T ↑ /post/$slug.html"
           $SED -i "/$filename_sum/d" $BLOG_LOCK
           echo "$slug $filename_sum $content_sum" >> $BLOG_LOCK
@@ -187,10 +187,12 @@ begin () {
 
       # If page is for rendering
       if [ $forRendering=true ]; then
+        local destination="$_DIST/post/$slug.html"
         render "$f" "$destination" "$title" "$slug" "$tags"
       fi
 
     else
+      local slug=$(get_existing_slug "$filename_sum")
       echo "$T ∙ /post/$slug.html"
     fi # Checks if working on tag index
 
@@ -216,7 +218,6 @@ fileList=(*.md)
 
 # Start generation
 _DIST=$DIST begin "${fileList[@]}"
-BLOG_LOCK=$(pwd)/.bloglock
 
 # Now generate indexes for tags
 OIFS="$IFS"

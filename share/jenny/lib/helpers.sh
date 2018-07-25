@@ -80,17 +80,8 @@ function get_filename() {
   echo $(get_full_filename "$1") | cut -d. -f1
 }
 
-function get_slug() {
+function get_unique_slug() {
   local slug=$(echo $(get_filename "$1") | rev | cut -d ' ' -f 1 | rev)
-  local filename_sum=$(get_full_filename "$1" | $SUM | cut -d ' ' -f 1)
-
-  if [ ! -z $_TAGNAME ]; then
-    local match=$($GREP " $filename_sum " $BLOG_LOCK)
-    if [ $? -eq 0 ]; then
-      echo $match | cut -d " " -f 1
-      exit 0
-    fi
-  fi
 
   $GREP "^$slug " $BLOG_LOCK > /dev/null
   if [ $? -eq 0 ]; then
@@ -102,6 +93,16 @@ function get_slug() {
     echo "$slug-$i"
   else
     echo $slug
+  fi
+
+}
+
+function get_existing_slug() {
+  local filename_sum=$1
+  local match=$($GREP "$filename_sum" $BLOG_LOCK)
+  if [ $? -eq 0 ]; then
+    echo $match | cut -d " " -f 1
+    exit 0
   fi
 }
 
