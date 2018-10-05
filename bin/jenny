@@ -36,11 +36,11 @@ if is_utils_installed; then
 fi
 
 # Use GNU utils if present
-[ "$(which gsed)" ] && SED=$(which gsed) || SED=$(which sed)
-[ "$(which gawk)" ] && AWK=$(which gawk) || AWK=$(which awk)
-[ "$(which gdate)" ] && DATE=$(which gdate) || DATE=$(which date)
-[ "$(which md5)" ] && SUM=$(which md5) || SUM=$(which md5sum)
-[ "$(which ggrep)" ] && GREP=$(which ggrep) || GREP=$(which grep)
+[ "$(which gsed 2>/dev/null)" ] && SED=$(which gsed) || SED=$(which sed)
+[ "$(which gawk 2>/dev/null)" ] && AWK=$(which gawk) || AWK=$(which awk)
+[ "$(which gdate 2>/dev/null)" ] && DATE=$(which gdate) || DATE=$(which date)
+[ "$(which md5 2>/dev/null)" ] && SUM=$(which md5) || SUM=$(which md5sum)
+[ "$(which ggrep 2>/dev/null)" ] && GREP=$(which ggrep) || GREP=$(which grep)
 
 function usage() {
   echo "$(basename $0) usage:" && grep " .)\ #" $0 | sed 's/) #//'  | sed 's/\ */   -/' | sed 's/ | \*//'
