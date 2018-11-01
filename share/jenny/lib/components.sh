@@ -75,6 +75,8 @@ index_insert () {
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
+        BLOG_HOST=$BLOG_HOST \
+        BLOG_TITLE=$BLOG_TITLE \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
 
       echo "$T ⌁ Generating RSS feed"
