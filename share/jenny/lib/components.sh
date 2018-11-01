@@ -24,6 +24,7 @@ render () {
     POST_URL="/post/$slug.html" \
     POST_DATE=$(get_post_date "$file") \
     POST_CONTENTS=$(cat $RENDER_TEMP_FILE) \
+    BLOG_HOST=$BLOG_HOST \
     TAGS=$tags \
     $LAYOUT_DIR/post.sh > $destination
 }
@@ -75,6 +76,7 @@ index_insert () {
       LIST="$IndexList" \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
+        BLOG_HOST=$BLOG_HOST \
         $LAYOUT_DIR/index.sh > "$_DIST/index.html"
 
       echo "$T ⌁ Generating RSS feed"
@@ -95,6 +97,7 @@ index_insert () {
         PAGE_NUM=$page \
         PAGE_OLD=$PAGE_OLD \
         PAGE_NEW=$PAGE_NEW \
+        BLOG_HOST=$BLOG_HOST \
         TAGNAME=$_TAGNAME \
         $LAYOUT_DIR/index.sh > "$_DIST/page/${page}.html"
     fi
