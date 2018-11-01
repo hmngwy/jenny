@@ -56,6 +56,6 @@ function sub_publish() {
 }
 
 function sub_edit () {
-  editor $(ls | grep $2)
+  editor "$(ls | grep $2)"
   exit 0
 }
