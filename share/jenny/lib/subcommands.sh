@@ -50,12 +50,12 @@ EOT
 }
 
 function sub_publish() {
-  echo "$T Published $(date +%Y-%m-%d) $2"
-  mv $2 "$(date +%Y-%m-%d) $2"
+  echo "$T Published $(date +%Y-%m-%d) ${*:2}"
+  mv "${*:2}" "$(date +%Y-%m-%d) ${*:2}"
   exit 0
 }
 
 function sub_edit () {
-  editor $(ls | grep $2)
+  editor "$(ls | grep $2)"
   exit 0
 }
