@@ -65,6 +65,7 @@ cat << _EOF_
     </style>
   </head>
   <body>
+    <h1>${BLOG_TITLE}</h1>
     $(if [ "$TAGNAME" ]; then echo "<header><a href=\"/tag/$TAGNAME\">TAG: $TAGNAME</a></header>"; fi)
     <ul class="posts">
 			$(index_loop)
