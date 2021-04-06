@@ -178,7 +178,7 @@ EOT
 
 Sites built with `jenny`.
 
-Me - [@hmngwy](https://github.com/hmngwy): [manilafunctional.com](https://manilafunctional.com/) 
+Me - [@hmngwy](https://github.com/hmngwy): [manilafunctional.com](https://manilafunctional.com/)<sup>[src](https://github.com/hmngwy/blog)</sup>
 
 Send a PR my way if you want to be on here. 
 
