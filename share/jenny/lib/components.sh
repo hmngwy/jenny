@@ -44,13 +44,12 @@ index_insert () {
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
   local is_page_new=$(( $post_index % $POSTS_PER_PAGE ))
   local url_prefix=""
+  local root="./.."
 
   # If working on a tag index page, adjust pagination links
   if [ $_TAGNAME ]; then
-    root="/tag/$_TAGNAME"
     url_prefix="./.."
-  else
-    root=""
+    root="."
   fi
 
   # Create the export line for the index.sh template

@@ -195,7 +195,7 @@ function get_page_new_url() {
   local page=$1
   local total_page_count=$2
   if [[ $(( page + 1 )) == $total_page_count ]]; then
-    echo "$ROOT/"
+    echo "../"
   else
     echo "$ROOT/page/$(( page + 1 )).html"
   fi
