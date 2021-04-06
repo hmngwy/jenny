@@ -19,13 +19,16 @@ _Jenny_ is a static blog generator. Its aim is to work with minimal requirements
 - [ ] Tests
 
 
-## Usage
+## Installation
 
 Install Jenny to your local bin folder.
 
 ```
+git clone https://github.com/hmngwy/jenny.git
 make install
 ```
+
+## Setting up a blog
 
 Prepare the directory for your blog posts.
 
@@ -41,7 +44,7 @@ jenny init
 
 Or you can proceed below to manually initialize your blog folder.
 
-### Manual Initialization
+### Manual setup
 
 _You can skip this step if you ran `jenny init`._
 
@@ -54,6 +57,8 @@ BLOG_TITLE="My Blog"
 EOT
 ```
 
+## Your first post
+
 Create a file with a date so that Jenny recognizes it as a published post.
 
 ```
@@ -64,9 +69,9 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-### Generate
+### Building
 
-Run `jenny` on your blog directory.
+Run `jenny` on your blog directory, or use the Docker image via `docker run -v $PWD/blog jenny`.
 
 ## Command Line Arguments
 
