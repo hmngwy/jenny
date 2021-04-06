@@ -1,0 +1,6 @@
+# action.yml
+name: 'jenny'
+description: 'build with jenny'
+runs:
+  using: 'docker'
+  image: 'docker://hmngwy/jenny:latest'
