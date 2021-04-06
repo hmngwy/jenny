@@ -50,22 +50,13 @@ Use the subcommand below to initialize your blog folder with a `.blogrc` file an
 jenny init
 ```
 
-Or you can proceed below to manually initialize your blog folder.
-
-### Manual setup
-
-_You can skip this step if you ran `jenny init`._
-
-Create a configuration file.
+Edit your config file to your liking.
 
 ```
-cat <<EOT >> .blogrc
-BLOG_HOST="example.com"
-BLOG_TITLE="My Blog"
-EOT
+edit .blogrc
 ```
 
-## Your first post
+## Creating a Blog Post
 
 Create a file with a date so that Jenny recognizes it as a published post.
 
@@ -77,7 +68,7 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-### Building
+### Building the Blog
 
 Run `jenny` on your blog directory.
 
