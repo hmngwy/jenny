@@ -31,7 +31,7 @@ make install
 #### 2. Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below
 
 ```
-docker run -it -v $PWD:/blog jenny:latest
+docker run -it -v $PWD:/blog hmngwy/jenny:latest
 ```
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
