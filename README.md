@@ -68,12 +68,12 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
-### Building the Blog
+## Building the Blog
 
 Run `jenny` on your blog directory.
 
 
-### As a Github Action
+## As a Github Action
 
 You can use `jenny` as a Github action to automatically build your blog, simply refer to this repository's address in your Workflow file. Below is an example of a Workflow that builds and deploys a blog into Github Pages.
 
