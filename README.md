@@ -36,7 +36,29 @@ docker run -it -v $PWD:/blog jenny:latest
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
 
-## Setting up a blog
+## As a Github Action
+
+You can use `jenny` as a Github Action to automatically build your blog, simply refer to this repository's address in your Workflow file. Below is an example of a Workflow that builds a repository using jenny.
+
+```
+on: [push]
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest
+    name:  Build with Jenny
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hmngwy/jenny@master
+    - uses: JamesIves/github-pages-deploy-action@4.1.1
+      with:
+        branch: gh-pages
+        folder: .dist
+```
+
+You can fork the [hmngwy/jenny-template](https://github.com/hmngwy/jenny-template) repo to start using `jenny` without installing a thing.
+
+## Setting up a Blog
 
 Prepare the directory for your blog posts.
 
@@ -67,25 +89,6 @@ EOT
 Run `jenny` on your blog directory.
 
 
-## As a Github Action
-
-You can use `jenny` as a Github action to automatically build your blog, simply refer to this repository's address in your Workflow file. Below is an example of a Workflow that builds and deploys a blog into Github Pages.
-
-```
-on: [push]
-
-jobs:
-  build_job:
-    runs-on: ubuntu-latest
-    name:  Build with Jenny
-    steps:
-    - uses: actions/checkout@v2
-    - uses: hmngwy/jenny@master
-    - uses: JamesIves/github-pages-deploy-action@4.1.1
-      with:
-        branch: gh-pages
-        folder: .dist
-```
 
 ## Command Line Arguments
 
