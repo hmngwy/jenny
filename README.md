@@ -174,6 +174,15 @@ LAYOUT_DIR=~/blog/.layout
 EOT
 ```
 
+## Plugs 🔌
+
+Sites built with `jenny`.
+
+Me - [@hmngwy](https://github.com/hmngwy): [manilafunctional.com](https://manilafunctional.com/) 
+
+Send a PR my way if you want to be on here. 
+
+
 ## Alternative Installation Modes
 
 To soft install or symlink into your bin folder, good for contributing/development: ```make sym-install [PREFIX=~/your/path]```
