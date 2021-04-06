@@ -31,7 +31,7 @@ make install
 Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below:
 
 ```
-docker run -v $PWD:/blog jenny:latest
+docker run -it -v $PWD:/blog jenny:latest
 ```
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
@@ -48,12 +48,6 @@ Use the subcommand below to initialize your blog folder with a `.blogrc` file an
 
 ```
 jenny init
-```
-
-Edit your config file to your liking.
-
-```
-edit .blogrc
 ```
 
 ## Creating a Blog Post
@@ -171,7 +165,7 @@ To use tags add the below into a post where `tagname` is both filename and URL f
 tags: tagname anothertag
 ```
 
-## Customization
+## Themes
 
 From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
 
