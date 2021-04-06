@@ -1,6 +1,9 @@
 # action.yml
 name: 'jenny-blog'
-description: 'build with jenny'
+description: 'blog with jenny'
+branding:
+  icon: 'book'  
+  color: 'yellow'
 runs:
   using: 'docker'
   image: 'docker://hmngwy/jenny:latest'
