@@ -19,16 +19,16 @@ _Jenny_ is a static blog generator. Its aim is to work with minimal requirements
 - [ ] Tests
 
 
-## Installation
+## Getting started, three ways 
 
-Install Jenny to your local bin folder.
+#### 1. You can install `jenny` to your local bin folder
 
 ```
 git clone https://github.com/hmngwy/jenny.git
 make install
 ```
 
-Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below:
+#### 2. Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below
 
 ```
 docker run -it -v $PWD:/blog jenny:latest
@@ -36,9 +36,9 @@ docker run -it -v $PWD:/blog jenny:latest
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
 
-## As a Github Action
+#### 3. Or, as a Github Action to automatically build your blog
 
-You can use `jenny` as a Github Action to automatically build your blog, simply refer to this repository's address in your Workflow file. Below is an example of a Workflow that builds a repository using jenny.
+This repository is also the Github Action source, simply reference it in your Worflow steps, below is an example.
 
 ```
 on: [push]
@@ -87,8 +87,6 @@ EOT
 ## Building the Blog
 
 Run `jenny` on your blog directory.
-
-
 
 ## Command Line Arguments
 
