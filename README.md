@@ -185,7 +185,10 @@ Send a PR my way if you want to be on here.
 
 ## Alternative Installation Modes
 
-To soft install or symlink into your bin folder, good for contributing/development: ```make sym-install [PREFIX=~/your/path]```
+To soft install or symlink into your bin folder, good for contributing/development: 
+```
+sudo make sym-install [PREFIX=$PWD]
+```
 
 To install into a custom location do: ```make install [PREFIX=~/.local]```
 

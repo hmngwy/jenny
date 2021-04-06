@@ -43,16 +43,18 @@ index_insert () {
   local post_date=$(get_post_date "$file")
   local post_date_rfc822=$(get_post_date_rfc822 "$file")
   local is_page_new=$(( $post_index % $POSTS_PER_PAGE ))
+  local url_prefix=""
 
   # If working on a tag index page, adjust pagination links
   if [ $_TAGNAME ]; then
     root="/tag/$_TAGNAME"
+    url_prefix="./.."
   else
     root=""
   fi
 
   # Create the export line for the index.sh template
-  IndexList+=("POST_URL=\"/post/$slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$post_date\" POST_DATE_RFC822=\"$post_date_rfc822\" TAGNAME=\"$_TAGNAME\"")
+  IndexList+=("POST_URL=\"$url_prefix/post/$slug.html\" POST_TITLE=\"$(echo $title | sed 's#\"#\\\"#')\" POST_DATE=\"$post_date\" POST_DATE_RFC822=\"$post_date_rfc822\" TAGNAME=\"$_TAGNAME\"")
 
   # Create page when we have enough for a page
   # Or when we don't have any more
@@ -75,6 +77,7 @@ index_insert () {
         done
       fi
       LIST="$IndexList" \
+	ROOT="yes" \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
         BLOG_HOST=$BLOG_HOST \
