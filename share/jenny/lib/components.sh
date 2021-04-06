@@ -77,7 +77,7 @@ index_insert () {
         done
       fi
       LIST="$IndexList" \
-	ROOT="yes" \
+	URL_PREFIX="." \
         PAGE_OLD=$PAGE_OLD \
         TAGNAME=$_TAGNAME \
         BLOG_HOST=$BLOG_HOST \
@@ -99,6 +99,7 @@ index_insert () {
       LastList=$IndexList # this is used in later loop iterations
       mkdir -p $_DIST/page
       LIST="$IndexList" \
+	URL_PREFIX=".." \
         PAGE_NUM=$page \
         PAGE_OLD=$PAGE_OLD \
         PAGE_NEW=$PAGE_NEW \
