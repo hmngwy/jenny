@@ -4,7 +4,7 @@
 IFS='✂︎' read -r -a array <<< "$LIST"
 
 function index_loop {
-	for (( idx=${#array[@]}-1 ; idx>=0 ; idx-- )) ; do
+  for (( idx=${#array[@]}-1 ; idx>=0 ; idx-- )) ; do
     [ "${array[idx]}" ] && eval "${array[idx]} list_item"
   done
 }
@@ -22,14 +22,14 @@ _LOOP_
 }
 
 function nav {
-	if [ "$PAGE_OLD" ] || [ "$PAGE_NEW" ]; then
+  if [ "$PAGE_OLD" ] || [ "$PAGE_NEW" ]; then
 cat << _NAV_
     <nav>
-			$([ "$PAGE_NEW" ] && echo "<a href=\"$PAGE_NEW\">← NEWER</a>")
-			$([ "$PAGE_OLD" ] && echo "<a href=\"$PAGE_OLD\">OLDER →</a>")
-		</nav>
+	$([ "$PAGE_NEW" ] && echo "<a href=\"$PAGE_NEW\">← NEWER</a>")
+	$([ "$PAGE_OLD" ] && echo "<a href=\"$PAGE_OLD\">OLDER →</a>")
+    </nav>
 _NAV_
-	fi
+  fi
 }
 
 cat << _EOF_
@@ -68,9 +68,9 @@ cat << _EOF_
     <h1>${BLOG_TITLE}</h1>
     $(if [ "$TAGNAME" ]; then echo "<header><a href=\"/tag/$TAGNAME\">TAG: $TAGNAME</a></header>"; fi)
     <ul class="posts">
-			$(index_loop)
+      $(index_loop)
     </ul>
-		$(nav)
+    $(nav)
   </body>
 </html>
 _EOF_
