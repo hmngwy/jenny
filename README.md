@@ -50,10 +50,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - uses: hmngwy/jenny@master
-    - uses: JamesIves/github-pages-deploy-action@4.1.1
-      with:
-        branch: gh-pages
-        folder: .dist
 ```
 
 You can fork the [hmngwy/jenny-template](https://github.com/hmngwy/jenny-template) repo to start using `jenny` without installing a thing.
@@ -63,7 +59,7 @@ You can fork the [hmngwy/jenny-template](https://github.com/hmngwy/jenny-templat
 Prepare the directory for your blog posts.
 
 ```
-mkdir -p ~/blog && cd ~/blog
+mkdir ./blog && cd blog
 ```
 
 Use the subcommand below to initialize your blog folder with a `.blogrc` file and a sample first post.
@@ -73,6 +69,12 @@ jenny init
 ```
 
 ## Creating a Blog Post
+
+A dated filename will be recognized as a published post, everything else is a draft and ignored, the format is:
+
+```
+YYYY-MM-DD a-published-post.md
+```
 
 Create a file with a date so that Jenny recognizes it as a published post.
 
@@ -114,51 +116,43 @@ jenny publish filename.md
 jenny edit partial-filename
 ```
 
-## Other Settings
-
-To install into a custom location do: ```make install [PREFIX=~/.local]```
-
-To soft install or symlink into your bin folder: ```make sym-install [PREFIX=~/your/path]```
-
-To uninstall, in the project folder run: ```make uninstall```
+## .blogrc settings
 
 To configure posts per page:
 
 ```
-cat <<EOT >> .blogrc
 POSTS_PER_PAGE=10
-EOT
 ```
 
 To use your own markdown parser, set `MARKDOWN_COMMAND`:
 
 ```
-cat <<EOT >> .blogrc
 MARKDOWN_COMMAND=multimarkdown
-EOT
 ```
 
 To run a script after the build process, write a `post_hook` function in .blogrc:
 
 ```
-cat << EOF >> .blogrc
 function post_hook() {
   echo "Done!"
 }
-EOF
 ```
 
 To set a different build folder, set `DIST`:
 
 ```
-cat << EOF >> .blogrc
 DIST=~/blog/.dist
-EOF
+```
+
+To copy directories into the build folder:
+
+```
+STATIC_DIRS="images files"
 ```
 
 ## Post Formatting
 
-Titles are Markdown H1s. Use Multimarkdown footnotes syntax.
+Titles are Markdown H1s. Multimarkdown footnotes syntax supported in the vendored parser.
 
 To use tags add the below into a post where `tagname` is both filename and URL friendly:
 
@@ -166,7 +160,7 @@ To use tags add the below into a post where `tagname` is both filename and URL f
 tags: tagname anothertag
 ```
 
-## Themes
+## Theme Customization
 
 From the project folder, copy the layout folder contents and modify to your liking, mind the template tags.
 
@@ -180,7 +174,16 @@ LAYOUT_DIR=~/blog/.layout
 EOT
 ```
 
+## Alternative Installation Modes
+
+To soft install or symlink into your bin folder, good for contributing/development: ```make sym-install [PREFIX=~/your/path]```
+
+To install into a custom location do: ```make install [PREFIX=~/.local]```
+
+To uninstall, in the project folder run: ```make uninstall```
+
 ## Credits
+
 - Layout inspired by n-o-d-e.net
 - Some colors from Solarized by Ethan Schoonover
 - Makefile inspired by [moebiuseye/skf](https://github.com/moebiuseye/skf)
