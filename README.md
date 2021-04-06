@@ -31,7 +31,7 @@ make install
 Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below:
 
 ```
-docker run -v $PWD/blog jenny:latest
+docker run -v $PWD:/blog jenny:latest
 ```
 
 ## Setting up a blog
