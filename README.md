@@ -28,6 +28,12 @@ git clone https://github.com/hmngwy/jenny.git
 make install
 ```
 
+Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below:
+
+```
+docker run -v $PWD/blog jenny:latest
+```
+
 ## Setting up a blog
 
 Prepare the directory for your blog posts.
@@ -71,7 +77,28 @@ EOT
 
 ### Building
 
-Run `jenny` on your blog directory, or use the Docker image via `docker run -v $PWD/blog jenny`.
+Run `jenny` on your blog directory.
+
+
+### As a Github Action
+
+You can use `jenny` as a Github action to automatically build your blog, simply refer to this repository's address in your Workflow file. Below is an example of a Workflow that builds and deploys a blog into Github Pages.
+
+```
+on: [push]
+
+jobs:
+  build_job:
+    runs-on: ubuntu-latest
+    name:  Build with Jenny
+    steps:
+    - uses: actions/checkout@v2
+    - uses: hmngwy/jenny@master
+    - uses: JamesIves/github-pages-deploy-action@4.1.1
+      with:
+        branch: gh-pages
+        folder: .dist
+```
 
 ## Command Line Arguments
 
