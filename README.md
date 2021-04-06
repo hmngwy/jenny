@@ -34,6 +34,8 @@ Or, skip installation and use Docker, all references to the command `jenny` is i
 docker run -v $PWD:/blog jenny:latest
 ```
 
+The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
+
 ## Setting up a blog
 
 Prepare the directory for your blog posts.
