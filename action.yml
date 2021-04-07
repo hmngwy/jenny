@@ -6,4 +6,4 @@ branding:
   color: 'yellow'
 runs:
   using: 'docker'
-  image: 'docker://hmngwy/jenny:latest'
+  image: 'docker://hmngwy/jenny:v1.2.1'
