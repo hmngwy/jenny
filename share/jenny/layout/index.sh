@@ -12,11 +12,11 @@ function index_loop {
 function list_item {
   if [ -z "$BREAK" ]; then
 cat << _LOOP_
-  <li class="post-link"><a href="$(echo $URL_PREFIX)$(echo $POST_URL)"><span class="stamp">$(echo $POST_DATE)</span> <span class="title">$(echo $POST_TITLE)</span></a></li>
+  <li class="post-link"><a href="$URL_PREFIX$POST_URL"><span class="stamp">$(date -d "$POST_DATE_RFC822" +%m/%d/%Y)</span> <span class="title">$POST_TITLE</span></a></li>
 _LOOP_
   else
 cat << _LOOP_
-  <li class="post-link"><a href="./page/$(echo $BREAK).html">In page $(echo $BREAK)</a></li>
+  <li class="post-link"><a href="./page/$BREAK.html">In page $BREAK</a></li>
 _LOOP_
   fi
 }
@@ -65,7 +65,10 @@ cat << _EOF_
     </style>
   </head>
   <body>
-    <h1>${BLOG_TITLE}</h1>
+    <header><a href="/">${BLOG_TITLE}</a>
+      $(if [ "$TAGNAME" ]; then echo "-> TAG == <a href=\"/tag/$TAGNAME\">$TAGNAME</a>"; fi)
+      $(if [ "$PAGE_NUM" ]; then echo "-> <a href=\"/page/$PAGE_NUM.html\">Page $PAGE_NUM</a>"; fi)
+    </header>
     $(if [ "$TAGNAME" ]; then echo "<header><a href=\"/tag/$TAGNAME\">TAG: $TAGNAME</a></header>"; fi)
     <ul class="posts">
       $(index_loop)
