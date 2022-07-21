@@ -23,6 +23,7 @@ render () {
   POST_TITLE=$title \
     POST_URL="/post/$slug.html" \
     POST_DATE=$(get_post_date "$file") \
+    POST_DATE_RFC822=$(get_post_date_rfc822 "$file") \
     POST_CONTENTS=$(cat $RENDER_TEMP_FILE) \
     BLOG_HOST=$BLOG_HOST \
     BLOG_TITLE=$BLOG_TITLE \
