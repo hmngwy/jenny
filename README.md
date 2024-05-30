@@ -204,7 +204,7 @@ To uninstall, in the project folder run: ```make uninstall```
 
 MIT License
 
-Copyright (c) 2017-2021 Conrado Patricio Ambrosio
+Copyright (c) 2024
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
