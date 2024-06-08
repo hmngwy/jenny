@@ -53,7 +53,7 @@ function is_installed() {
 
 function get_total_post_count() {
   local list=("$@")
-	local non_draft=($(printf "%s\n" "${list[@]}" | $GREP -E '^[0-9]{4}\-[0-9]{2}\-[0-9]{2}(.*)'))
+	local non_draft=($(printf "%s\n" "${list[@]}" | $GREP -E '^[0-9]{4}-[0-9]{2}-[0-9]{2}(.*)'))
 	local count=0
   for f1 in "${non_draft[@]}"; do
 		if ! is_scheduled "$f1"; then
@@ -177,7 +177,7 @@ function is_changed() {
 }
 
 function get_title() {
-  echo $($GREP -E "^\#\ (.*?)" "$1" | \
+  echo $($GREP -E "^#\s(.*?)" "$1" | \
     $SED 's/^\#\ \(.*\)/\1/' | \
     $SED -r 's/\\(.)/\1/g' )
 }
@@ -200,3 +200,4 @@ function get_page_new_url() {
     echo "$ROOT/page/$(( page + 1 )).html"
   fi
 }
+
