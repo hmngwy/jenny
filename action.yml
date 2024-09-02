@@ -6,4 +6,4 @@ branding:
   color: 'yellow'
 runs:
   using: 'docker'
-  image: 'docker://ghcr.io/hmngwy/jenny:master'
+  image: 'docker://ghcr.io/hmngwy/jenny:latest'
