@@ -52,7 +52,11 @@ jobs:
     - uses: hmngwy/jenny@master
 ```
 
+#### 4. Or, fork this template repo
+
 You can fork the [hmngwy/jenny-template](https://github.com/hmngwy/jenny-template) repo to start using `jenny` without installing a thing.
+
+---
 
 ## Setting up a Blog
 
@@ -86,11 +90,13 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
+---
+
 ## Building the Blog
 
 Run `jenny` on your blog directory.
 
-## Command Line Arguments
+## CLI Arguments
 
 To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
@@ -116,7 +122,7 @@ jenny publish filename.md
 jenny edit partial-filename
 ```
 
-## .blogrc settings
+## Customize defualt behaviors with .blogrc settings
 
 To configure posts per page:
 
