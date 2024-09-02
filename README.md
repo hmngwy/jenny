@@ -19,7 +19,7 @@ _Jenny_ is a static blog generator. Its aim is to work with minimal requirements
 - [ ] Tests
 
 
-## Getting started, three ways 
+## Getting started, four ways 
 
 #### 1. You can install `jenny` to your local bin folder
 
@@ -31,7 +31,7 @@ make install
 #### 2. Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below
 
 ```
-docker run -it -v $PWD:/blog hmngwy/jenny:latest
+docker run -it -v $PWD:/blog ghcr.io/hmngwy/jenny:latest
 ```
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
