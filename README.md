@@ -18,6 +18,8 @@ _Jenny_ is a static blog generator. Its aim is to work with minimal requirements
 - [x] RSS/Atom feed
 - [ ] Tests
 
+[![publish on gh packages](https://github.com/hmngwy/jenny/actions/workflows/publish-image.yml/badge.svg)](https://github.com/hmngwy/jenny/actions/workflows/publish-image.yml)
+
 
 ## Getting started, four ways 
 
