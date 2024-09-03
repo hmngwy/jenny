@@ -3,7 +3,7 @@
 _Jenny_ is a static blog generator. Its aim is to work with minimal requirements and a small footprint while providing some modern conveniences.
 
 - [x] Lightweight default theme
-- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk)
+- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk) (currently broken, please byo multimarkdown parser)
 - [x] Basic pagination with fixed page numbers
 - [x] Plug your own Markdown parser
 - [x] Heredocs-based template syntax
