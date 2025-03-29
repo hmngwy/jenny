@@ -3,7 +3,7 @@
 _Jenny_ is a static blog generator. Its aim is to work with minimal requirements and a small footprint while providing some modern conveniences.
 
 - [x] Lightweight default theme
-- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk)
+- [x] Markdown with Footnotes support, care of a modified [md2html.awk](https://bitbucket.org/yiyus/md2html.awk) (currently broken, please byo multimarkdown parser)
 - [x] Basic pagination with fixed page numbers
 - [x] Plug your own Markdown parser
 - [x] Heredocs-based template syntax
@@ -18,8 +18,10 @@ _Jenny_ is a static blog generator. Its aim is to work with minimal requirements
 - [x] RSS/Atom feed
 - [ ] Tests
 
+[![publish on gh packages](https://github.com/hmngwy/jenny/actions/workflows/publish-image.yml/badge.svg)](https://github.com/hmngwy/jenny/actions/workflows/publish-image.yml)
 
-## Getting started, three ways 
+
+## Getting started, four ways 
 
 #### 1. You can install `jenny` to your local bin folder
 
@@ -31,7 +33,7 @@ make install
 #### 2. Or, skip installation and use Docker, all references to the command `jenny` is interchangeable with the below
 
 ```
-docker run -it -v $PWD:/blog hmngwy/jenny:latest
+docker run -it -v $PWD:/blog ghcr.io/hmngwy/jenny:latest
 ```
 
 The Docker image contains Multimarkdown 6 so you can have `MARKDOWN_COMMAND="multimarkdown "` in your `.blogrc`.
@@ -52,7 +54,11 @@ jobs:
     - uses: hmngwy/jenny@master
 ```
 
+#### 4. Or, fork this template repo
+
 You can fork the [hmngwy/jenny-template](https://github.com/hmngwy/jenny-template) repo to start using `jenny` without installing a thing.
+
+---
 
 ## Setting up a Blog
 
@@ -86,11 +92,13 @@ Jenny is a static blog generator using bash, sed, and awk.
 EOT
 ```
 
+---
+
 ## Building the Blog
 
 Run `jenny` on your blog directory.
 
-## Command Line Arguments
+## CLI Arguments
 
 To override `.blogrc` settings at run-time use command line arguments. Other options are also available, use `jenny -h` to display the message below:
 
@@ -116,7 +124,7 @@ jenny publish filename.md
 jenny edit partial-filename
 ```
 
-## .blogrc settings
+## Customize defualt behaviors with .blogrc settings
 
 To configure posts per page:
 
@@ -204,7 +212,7 @@ To uninstall, in the project folder run: ```make uninstall```
 
 MIT License
 
-Copyright (c) 2017-2021 Conrado Patricio Ambrosio
+Copyright (c) 2024
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal

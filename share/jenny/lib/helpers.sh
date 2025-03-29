@@ -127,7 +127,7 @@ function get_post_date_int() {
 }
 
 function get_post_date_rfc822() {
-  $DATE --rfc-822 --date="$(stat -c %y "$1")"
+  $DATE --rfc-822 --date="$(echo $(get_timestamp "$1") | $SED -e 's#\([0-9]\{4\}\)-\([0-9]\{2\}\)-\([0-9]\{2\}\)#\1/\2/\3#')"
 }
 
 function get_tags() {
@@ -178,7 +178,6 @@ function is_changed() {
 
 function get_title() {
   echo $($GREP -E "^#\s(.*?)" "$1" | \
-    $SED 's/^#\s\(.*\)/\1/' | \
     $SED -r 's/\\(.)/\1/g' )
 }
 
@@ -200,3 +199,4 @@ function get_page_new_url() {
     echo "$ROOT/page/$(( page + 1 )).html"
   fi
 }
+
